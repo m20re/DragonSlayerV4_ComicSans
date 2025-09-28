@@ -21,7 +21,7 @@
   <tabs>
     <Tab text="Customers">
          <content>
-            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane" stylesheets="@/styles/newer_style.css">
+            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane"> <!-- stylesheets="@/styles/newer_style.css" -->
                <children>
                   <TableView fx:id="customerTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="80.0">
                     <columns>
