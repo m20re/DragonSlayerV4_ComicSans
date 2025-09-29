@@ -19,7 +19,7 @@
     <cucumber.version>7.14.0</cucumber.version>
     <surefire.version>3.2.5</surefire.version>
     <jlink.plugin.version>3.1.0</jlink.plugin.version>
-    <jpackage.plugin.version>1.7.0</jpackage.plugin.version>
+    <jpackage.plugin.version>1.7.1</jpackage.plugin.version>
 
     <!-- Change this according to OS: win, linux, mac --> 
     <javafx.platform>win</javafx.platform>  
@@ -135,69 +135,106 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
-            <argLine>--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</argLine>
         </configuration>
     </plugin>
 
-    <!-- Jlink plugin for Maven (creates trimmed JRE) -->
-      <!-- Create trimmed runtime image in target/runtime -->
     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jlink-plugin</artifactId>
-        <version>${jlink.plugin.version}</version>
-        <configuration>
-          <addModules>
-            <addModule>${app.main.module}</addModule>
-            <addModule>java.sql</addModule>
-            <addModule>javafx.controls</addModule>
-            <addModule>javafx.fxml</addModule>
-          </addModules>
-          <stripDebug>true</stripDebug>
-          <noHeaderFiles>true</noHeaderFiles>
-          <noManPages>true</noManPages>
-          <compress>2</compress>
-          <output>${project.build.directory}/runtime</output>
-        </configuration>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
         <executions>
-          <execution>
+            <execution>
             <id>make-runtime</id>
             <phase>package</phase>
-            <goals>
-              <goal>jlink</goal>
-            </goals>
-          </execution>
+            <goals><goal>exec</goal></goals>
+            <configuration>
+                <executable>jlink</executable>
+                <arguments>
+                <!-- use ONLY the JDK's jmods as the module-path -->
+                <argument>--module-path</argument>
+                <argument>${java.home}/jmods</argument>
+
+                <!-- include just the JDK modules you actually need -->
+                <argument>--add-modules</argument>
+                <argument>java.se,jdk.unsupported,jdk.xml.dom</argument>
+
+                <!-- size trims -->
+                <argument>--strip-debug</argument>
+                <argument>--no-header-files</argument>
+                <argument>--no-man-pages</argument>
+                <argument>--compress</argument>
+                <argument>2</argument>
+
+                <!-- output dir for the custom runtime -->
+                <argument>--output</argument>
+                <argument>${project.build.directory}/mini-jre</argument>
+                </arguments>
+            </configuration>
+            </execution>
         </executions>
     </plugin>
 
 
+    <!-- Copes app JAR into jpkg-mods -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+            <outputDirectory>${project.build.directory}/jpkg-mods</outputDirectory>
+        </configuration>
+    </plugin>
+
+    <!-- Copies runtime dependencies to jpkg-mods -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+            <execution>
+            <id>copy-runtime-mods</id>
+            <phase>package</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+                <includeScope>runtime</includeScope>
+                <outputDirectory>${project.build.directory}/jpkg-mods</outputDirectory>
+            </configuration>
+            </execution>
+        </executions>
+    </plugin>
+
 
     <!-- Jpackage plugin for Maven -->
-          <!-- Package with jpackage: app-image (dev) or MSI (release) -->
+    <!-- Uses prebuilt runtime with automatic modules -->
     <plugin>
         <groupId>org.panteleyev</groupId>
         <artifactId>jpackage-maven-plugin</artifactId>
         <version>${jpackage.plugin.version}</version>
         <configuration>
             <name>${app.name}</name>
-            <appVersion>${project.version}</appVersion>
+            <appVersion>${app.version.pkg}</appVersion>
             <vendor>${app.vendor}</vendor>
 
-            <!-- Inputs/outputs -->
-            <input>${project.build.directory}</input>
-            <dest>${project.build.directory}/distributable</dest>
+            <!-- Modular build -->
+            <module>${app.main.module}/${app.main.class}</module>
+
+            <!-- Finds the jpkg-folder to build with dependencies -->
+            <modulePaths><path>${project.build.directory}/jpkg-mods</path></modulePaths>
+
+            <runtimeImage>${project.build.directory}/mini-jre</runtimeImage>
+            
+            <destination>${project.build.directory}/distributable</destination>
             <type>${jpackage.type}</type>
 
-            <!-- App entrypoints -->
-            <mainJar>${project.build.finalName}.jar</mainJar>
-            <mainClass>${app.main.class}</mainClass>
-            <runtimeImage>${project.build.directory}/runtime</runtimeImage>
+            <!-- Debug -->
+            <winConsole>true</winConsole>
 
-            <!-- Windows options -->
-            <winMenu>true</winMenu>
-            <winShortcut>true</winShortcut>
+            <!-- Windows related features 
+            !! Does not work with APP_IMAGE, only with MSI !! -->
+            <!-- <winMenu>true</winMenu>
+            <winShortcut>true</winShortcut>  -->
             <!-- Drop for GUI apps if you don't want a console window: -->
             <!-- <winConsole>false</winConsole> -->
-
             <!-- Optional: icon -->
             <!-- <icon>${project.basedir}/icons/app.ico</icon> -->
         </configuration>
@@ -255,4 +292,23 @@
             </plugin> -->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <jpackage.type>APP_IMAGE</jpackage.type>
+                <app.version.pkg>4.0.0</app.version.pkg>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <jpackage.type>MSI</jpackage.type>
+                <app.version.pkg>4.0.0</app.version.pkg>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
