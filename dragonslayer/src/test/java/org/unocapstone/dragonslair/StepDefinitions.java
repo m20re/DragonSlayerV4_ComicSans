@@ -685,12 +685,13 @@ public class StepDefinitions extends ApplicationTest {
         List<List<String>> rows = t.asLists(String.class);
         for (List<String> columns : rows.subList(1, rows.size())) {
             requestTables.add(
-                    new RequestTable(
-                            Objects.toString(columns.get(0), ""),
-                            Objects.toString(columns.get(1), ""),
-                            columns.get(2) == null ? 0 : Integer.parseInt(columns.get(2)),
-                            columns.get(3) == null ? 0 : Integer.parseInt(columns.get(3))
-                    ));
+                new RequestTable(
+                    0,  // placeholder for the orderId
+                    Objects.toString(columns.get(0), ""),
+                    Objects.toString(columns.get(1), ""),
+                    columns.size() > 2 && columns.get(2) != null ? Integer.parseInt(columns.get(2)) : 0,
+                    columns.size() > 3 && columns.get(3) != null ? Integer.parseInt(columns.get(3)) : 0
+            ));
         }
         return requestTables;
     }
