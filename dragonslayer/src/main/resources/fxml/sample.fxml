@@ -21,7 +21,7 @@
   <tabs>
     <Tab text="Customers">
          <content>
-            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane" stylesheets="@/styles/newer_style.css">
+            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane">
                <children>
                   <TableView fx:id="customerTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="80.0">
                     <columns>
@@ -203,9 +203,38 @@
                                     <TableColumn fx:id="titleOrderIssueColumn" text="Issue" />
                                  </columns>
                               </TableView>
-                              <VBox alignment="BOTTOM_CENTER" onMouseClicked="#passTitleKeyboardFocus" prefHeight="200.0" prefWidth="100.0">
+                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" onMouseClicked="#passTitleKeyboardFocus">
                                  <children>
-                                    <Button fx:id="singleTitleReportButton" alignment="CENTER" mnemonicParsing="false" onAction="#handleExportSingleTitle" prefWidth="100.0" text="Export Single Title List" wrapText="true">
+                                    <VBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="8.0">
+                                       <children>
+                                          <Button fx:id="addRequestButton"
+                                                  text="Add"
+                                                  prefWidth="100.0"
+                                                  mnemonicParsing="false"
+                                                  onAction="#handleAddRequest">
+                                             <font>
+                                                <Font size="11.0"/>
+                                             </font>
+                                          </Button>
+                                          <Button fx:id="deleteRequestButton"
+                                                  text="Delete"
+                                                  prefWidth="100.0"
+                                                  mnemonicParsing="false"
+                                                  onAction="#handleDeleteRequest">
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+
+                                    <Button fx:id="singleTitleReportButton"
+                                            alignment="CENTER"
+                                            mnemonicParsing="false"
+                                            onAction="#handleExportSingleTitle"
+                                            prefWidth="100.0"
+                                            text="Export Single Title List"
+                                            wrapText="true">
                                        <font>
                                           <Font size="11.0" />
                                        </font>
