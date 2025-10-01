@@ -16,12 +16,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.StackPane?>
 
 <TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
   <tabs>
     <Tab text="Customers">
          <content>
-            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane">
+            <AnchorPane fx:id="CustomerAnchorPane" onKeyPressed="#handleCustomerKeyboardInput" onMouseClicked="#passCustomerKeyboardFocus" styleClass="anchorpane"> <!-- stylesheets="@/styles/newer_style.css" -->
                <children>
                   <TableView fx:id="customerTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="80.0">
                     <columns>

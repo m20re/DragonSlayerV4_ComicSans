@@ -5,6 +5,7 @@ package org.unocapstone.dragonslair;
  */
 public class RequestTable {
 
+    private final int orderId;
     private String requestLastName;
     private String requestFirstName;
     private int requestQuantity;
@@ -16,13 +17,20 @@ public class RequestTable {
      * @param requestFirstName the first name of the requestign customer
      * @param requestQuantity the quantity of the customer's order
      */
-    public RequestTable(String requestLastName, String requestFirstName, int requestQuantity, int issueNumber){
+    public RequestTable(int orderId, String requestLastName, String requestFirstName, int requestQuantity, int issueNumber){
 
+        this.orderId = orderId;
         this.requestLastName = requestLastName;
         this.requestFirstName = requestFirstName;
         this.requestQuantity = requestQuantity;
         this.requestIssue = issueNumber;
     }
+
+    /**
+     * Gets the orderId of the person for the selected title.
+     * @return the customer's orderId for the selected title.
+     */
+    public int getOrderId() { return orderId; }
 
     /**
      * Gets the last name of the customer for this object
