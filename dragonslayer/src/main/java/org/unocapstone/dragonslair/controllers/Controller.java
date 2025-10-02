@@ -2947,7 +2947,10 @@ public class Controller implements Initializable {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
                     }
-                    titleTable.getItems().setAll(getTitles());
+                    //titleTable.getItems().setAll(getTitles()); <- Original code
+                    invalidateTitles();
+                    titleTable.setItems(getTitles());
+                    titleTable.refresh();
                     this.loadReportsTab();
                 });
         this.unsaved = false;
@@ -3663,7 +3666,7 @@ public class Controller implements Initializable {
             title.setFlagged(!title.isFlagged());
         }
 
-        titleTable.getSelectionModel().getSelectedItem().setFlagged(!titleTable.getSelectionModel().getSelectedItem().isFlagged());
+        //titleTable.getSelectionModel().getSelectedItem().setFlagged(!titleTable.getSelectionModel().getSelectedItem().isFlagged());
         //https://stackoverflow.com/questions/48616490/how-to-add-a-javafx-shortcut-key-combinations-for-buttons
         //https://stackoverflow.com/questions/25397742/javafx-keyboard-event-shortcut-key
     }
