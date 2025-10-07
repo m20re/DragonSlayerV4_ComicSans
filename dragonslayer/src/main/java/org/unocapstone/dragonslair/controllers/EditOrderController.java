@@ -87,18 +87,30 @@ public class EditOrderController {
         }
         else {
             int titleID = getChoice(setTitle);
-            String issue = setIssue.getText();
-            if (issue == "") {
-                issue = null;
+            String issueText = setIssue.getText();
+            Integer issueValue = null;
+            if (issueText != null && !issueText.trim().isEmpty()) {
+                try {
+                    issueValue = Integer.valueOf(issueText.trim());
+                } catch (NumberFormatException nfe) {
+                    // invalid issue number -> show error and abort
+                    orderQuantityErrorText.setVisible(true);
+                    return;
+                }
             }
             String quantity = setQuantity.getText();
             int customerId = this.customerId;
 
             try {
                 s = conn.prepareStatement(sql);
-                s.setString(1, Integer.toString(titleID));
-                s.setString(2, quantity);
-                s.setObject(3, issue, Types.INTEGER);
+                s.setInt(1, titleID);
+                // quantity is expected to be numeric in DB; use setInt when possible
+                try {
+                    s.setInt(2, Integer.parseInt(quantity));
+                } catch (NumberFormatException nfe) {
+                    s.setString(2, quantity);
+                }
+                s.setObject(3, issueValue, Types.INTEGER);
 
                 s.setString(4, prevCustomerId);
                 s.setString(5, prevTitle);
@@ -109,10 +121,14 @@ public class EditOrderController {
                 rowsAffected = s.executeUpdate();
                 s.close();
 
-                orderWasEdited = true;
-                Log.LogEvent("Edited Order", "Edited order - CustomerID: " + customerId + " - Title: " + FxUtilTest.getComboBoxValue(setTitle) + " - Quantity: " + quantity + " - Issue: " 
-                                        + (issue == null ? null : Integer.valueOf(issue))
-                                        + " - Previous Title: " + prevTitle + " - Previous Quantity: " + prevQuantity + " - Previous Issue: " + prevIssue);
+                if (rowsAffected > 0) {
+                    orderWasEdited = true;
+                    Log.LogEvent("Edited Order", "Edited order - CustomerID: " + customerId + " - Title: " + FxUtilTest.getComboBoxValue(setTitle) + " - Quantity: " + quantity + " - Issue: " 
+                                            + (issueValue == null ? null : issueValue)
+                                            + " - Previous Title: " + prevTitle + " - Previous Quantity: " + prevQuantity + " - Previous Issue: " + prevIssue);
+                } else {
+                    Log.LogEvent("Edited Order", "No rows affected when attempting to edit order - CustomerID: " + customerId);
+                }
             } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                 sqlExcept.printStackTrace();
