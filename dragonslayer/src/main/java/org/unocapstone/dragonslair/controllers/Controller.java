@@ -220,7 +220,9 @@ public class Controller implements Initializable {
               AND ISSUE IS NULL
             """;
     
+        boolean previousAutoCommit = true;
         try {
+            previousAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
     
             try (PreparedStatement psWithIssue = conn.prepareStatement(DELETE_WITH_ISSUE);
@@ -229,6 +231,19 @@ public class Controller implements Initializable {
                 for (RequestTable r : selected) {
                     String last  = (r.getRequestLastName()  == null ? "" : r.getRequestLastName()).trim().toUpperCase();
                     String first = (r.getRequestFirstName() == null ? "" : r.getRequestFirstName()).trim().toUpperCase();
+    
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirm.setTitle("Confirm Deletion");
+                    confirm.setHeaderText(null);
+                    confirm.setContentText(String.format("Are you sure you want to delete %s %s?", first, last));
+    
+                    ButtonType yes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+                    ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    confirm.getButtonTypes().setAll(yes, cancel);
+    
+                    if (confirm.showAndWait().orElse(cancel) == cancel) {
+                        continue;
+                    }
     
                     int issue = 0;
                     if (r.getRequestIssue() != null && !r.getRequestIssue().isBlank()) {
@@ -257,7 +272,6 @@ public class Controller implements Initializable {
             }
     
             conn.commit();
-            conn.setAutoCommit(true);
     
             titleOrdersTable.getItems().setAll(getRequests(selectedTitle.getId(), -9));
             titleNumberRequestsText.setText(
@@ -266,9 +280,10 @@ public class Controller implements Initializable {
     
         } catch (SQLException ex) {
             try { conn.rollback(); } catch (SQLException ignore) {}
-            try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
             new Alert(Alert.AlertType.ERROR,
                     "Could not delete request(s): " + ex.getSQLState() + " : " + ex.getMessage()).showAndWait();
+        } finally {
+            try { conn.setAutoCommit(previousAutoCommit); } catch (SQLException ignore) {}
         }
     }
 
