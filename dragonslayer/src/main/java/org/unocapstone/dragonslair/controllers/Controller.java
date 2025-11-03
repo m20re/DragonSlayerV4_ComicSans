@@ -3209,6 +3209,21 @@ public class Controller implements Initializable {
         customerTable.getSelectionModel().getSelectedItem().setDelinquent(!customerTable.getSelectionModel().getSelectedItem().getDelinquent());
     }
 
+     /**
+     * Opens DerbyDB folder automatically
+     */
+    @FXML
+    void handleDerbyOpen() 
+    {
+        // Opens file explorer directly
+        try {
+            new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     //#endregion
 
