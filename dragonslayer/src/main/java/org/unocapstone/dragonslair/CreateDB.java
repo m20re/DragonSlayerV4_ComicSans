@@ -30,9 +30,10 @@ public class CreateDB {
 
         try {
             String dbName = "derbyDB";
-            //NOTE: This is the install location of the database, hardcoding to work on my machine now.
-            //We will need to change this in the future.
-
+            // (old) NOTE: This is the install location of the database, hardcoding to work on my machine now.
+            // (old) We will need to change this in the future.
+        
+            // I think dbLocation must've been added by a different group.
             conn = DriverManager.getConnection("jdbc:derby:" + settings.getSetting("dbLocation") + ";create=true");
 
             System.out.println("Connected to db " + dbName);
