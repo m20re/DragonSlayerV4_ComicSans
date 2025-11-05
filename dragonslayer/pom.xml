@@ -15,9 +15,9 @@
     <maven.compiler.release>21</maven.compiler.release>
     <javafx.version>21.0.8</javafx.version>
     <derby.version>10.15.2.0</derby.version>
-    <junit.version>4.13.2</junit.version>
+    <junit.version>5.10.3</junit.version>
     <cucumber.version>7.14.0</cucumber.version>
-    <surefire.version>3.2.5</surefire.version>
+    <surefire.version>3.5.2</surefire.version>
     <jlink.plugin.version>3.1.0</jlink.plugin.version>
     <jpackage.plugin.version>1.7.1</jpackage.plugin.version>
 
@@ -30,6 +30,19 @@
     <app.name>DragonSlayer</app.name>
     <app.vendor>UNO Capstone</app.vendor>
 </properties>
+
+<!-- Ensures all JUnit 5 files are compatible -->
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>${junit.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>    
+    </dependencies>
+</dependencyManagement>
 
 <dependencies>
     <!-- JavaFX (platform-classified) -->
@@ -61,7 +74,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!--  -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -79,15 +91,19 @@
       <version>1.16</version>
     </dependency>
 
-    <!-- JUnit -->
+    <!-- JUnit 5 -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-launcher</artifactId>
+        <scope>test</scope>
     </dependency>
 
-    <!-- Cucumber -->
+    <!-- Cucumber for JUnit 5 -->
     <dependency>
         <groupId>io.cucumber</groupId>
         <artifactId>cucumber-java</artifactId>
@@ -96,16 +112,35 @@
     </dependency>
     <dependency>
         <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-junit</artifactId>
+        <artifactId>cucumber-junit-platform-engine</artifactId>
         <version>${cucumber.version}</version>
         <scope>test</scope>
     </dependency>
+
+    <!-- TestFX for Junit 5 -->
+    <!-- https://mvnrepository.com/artifact/org.testfx/testfx-junit5 -->
     <dependency>
         <groupId>org.testfx</groupId>
-        <artifactId>testfx-junit</artifactId>
+        <artifactId>testfx-junit5</artifactId>
         <version>4.0.18</version>
         <scope>test</scope>
     </dependency>
+
+   <!-- Old JUnit -->
+    <!-- <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency> -->
+
+    <!-- Cucumber -->
+    <!-- <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-junit</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency> -->
 </dependencies>
     
 <build>
@@ -135,9 +170,11 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
+            <useModulePath>false</useModulePath>
         </configuration>
     </plugin>
 
+    <!-- JLink mvn plugin to create app JAR with common modules -->
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -175,7 +212,7 @@
     </plugin>
 
 
-    <!-- Copes app JAR into jpkg-mods -->
+    <!-- Copes Dragon Slayer JAR into jpkg-mods, for linking -->
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -185,7 +222,7 @@
         </configuration>
     </plugin>
 
-    <!-- Copies runtime dependencies to jpkg-mods -->
+    <!-- Copies runtime dependencies, such as JavaFX, to jpkg-mods -->
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
