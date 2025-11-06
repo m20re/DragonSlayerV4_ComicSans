@@ -48,6 +48,10 @@ abstract class BaseFxUiTest {
         r.clickOn("#addCustomerButtonMain");
     }
 
+    protected void openEditCustomer(FxRobot r) {
+        r.clickOn(null);
+    }
+
     protected void createNewCustomer(FxRobot r, String first, String last, String phone) {
         r.clickOn("#newCustomerFirstName").write(first);
         r.clickOn("#newCustomerLastName").write(last);
