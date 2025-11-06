@@ -1,5 +1,6 @@
 package org.unocapstone.dragonslair;
 
+import static org.unocapstone.dragonslair.Helpers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ public class CustomerAddUiTest extends BaseFxUiTest {
         /* Makes sure the customer count is also correct */
         int before = controller.getCustomers().size();
         openAddNewCustomer(robot);
-        createNewCustomer(robot, "test", "john", "402-672-6969");
+        createNewCustomer(robot, generateRandomName(), "john", generateRandomPhoneNumber());
 
         assertEquals(before + 1, controller.getCustomers().size());
     }

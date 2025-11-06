@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/* Sanity test */
+/* Sanity test, used for ensuring that configuration is correct */
+/* TODO: Delete once all tests are functional */
 class TestTheTest {
     @Test
     void adds() {
