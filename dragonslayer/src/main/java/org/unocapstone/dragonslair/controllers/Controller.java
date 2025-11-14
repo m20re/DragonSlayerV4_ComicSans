@@ -3215,16 +3215,25 @@ public class Controller implements Initializable {
     @FXML
     void handleDerbyOpen() 
     {
-        // Opens file explorer directly
-        try {
-            new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
+        try 
+        {
+            String dbLocation = System.getProperty("user.dir");
+            File directory = new File(dbLocation);
+            
+            if (!directory.exists())
+            {
+                // attempt to open through the lastopened.txt folder
+                new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
+            }
+
+            new ProcessBuilder("explorer.exe", dbLocation).start();
+            
+        } catch (FileNotFoundException e) {
+            /*TODO: Add prompt "run as admin" */
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
     //#endregion
 
 /*######################################################################/
