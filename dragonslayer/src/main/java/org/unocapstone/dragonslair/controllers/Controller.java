@@ -25,6 +25,13 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -134,7 +141,7 @@ public class Controller implements Initializable {
     @FXML private Button deleteOrderButton;
     @FXML private Button exportSingleCustomerListButton;
 
-    @FXML private Text titleTitleText;
+    //@FXML private Text titleTitleText;
     @FXML private Text titleProductIdText;
     @FXML private Text titlePriceText;
     @FXML private Text titleDateCreatedText;
@@ -172,9 +179,11 @@ public class Controller implements Initializable {
 
     private FilteredList<Title> filteredTitles;
     private SortedList<Title>   sortedTitles;
+    private String currentFullTitle = "";
 
     @FXML private TextField TitleSearch;
     @FXML private Button addRequestButton;
+    @FXML private Label titleTitleText;    
 
     // private boolean setAll;
     //#endregion
@@ -1104,6 +1113,13 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     
+        titleTitleText.setOnMouseEntered(ev -> {
+            titleTitleText.setMaxHeight(Double.MAX_VALUE);
+        });
+        titleTitleText.setOnMouseExited(ev -> {
+            titleTitleText.setMaxHeight(Region.USE_COMPUTED_SIZE);
+        });
+        
         // create settings object
         settings = new Settings();
     
@@ -1316,36 +1332,44 @@ public class Controller implements Initializable {
         //Add Listener for Titles table
         titleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             ObservableList<Title> selectedTitles = titleTable.getSelectionModel().getSelectedItems();
-    
+        
             //Bibash switch current view to TITLE page
             Main.clearKeyword();
             currentPage = CURRENT_PAGE.TITLE;
-    
+        
             if (newSelection != null)
             {
                 if (selectedTitles.size() == 1)
                 {
-                    titleTitleText.setText(newSelection.getTitle());
+                    currentFullTitle = (newSelection.getTitle() == null) ? "" : newSelection.getTitle().trim();
+
+                    final int MAX_CHARS = 70;
+                    String shortTitle = (currentFullTitle.length() > MAX_CHARS)
+                            ? currentFullTitle.substring(0, MAX_CHARS) + "…"
+                            : currentFullTitle;
+
+                    titleTitleText.setText(shortTitle);
+
                     titleProductIdText.setText(newSelection.getProductId());
-    
+            
                     if (newSelection.getPrice() > 0) {
                         titlePriceText.setText(newSelection.getPriceDollars());
                     }
                     else {
                         titlePriceText.setText("");
                     }
-    
+            
                     if (newSelection.getDateCreated() != null) {
                         titleDateCreatedText.setText(newSelection.getDateCreated().toString());
                     }
                     else {
                         titleDateCreatedText.setText("Unknown");
                     }
-    
+            
                     titleNotesText.setText(newSelection.getNotes());
                     String numberRequests = String.format("This Title Currently has %s Customer Requests", getNumberRequests(newSelection.getId()));
                     LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
-    
+            
                     if (newSelection.getDateFlagged() != null) {
                         titleDateFlagged.setText(newSelection.getDateFlagged().toString());
                         if (newSelection.getDateFlagged().isBefore(sixMonthsAgo) && (newSelection.getDateCreated() == null || newSelection.getDateCreated().isBefore(sixMonthsAgo))) {
@@ -1363,14 +1387,15 @@ public class Controller implements Initializable {
                         titleDateFlaggedNoticeText.setVisible(true);
                     }
                     titleNumberRequestsText.setText(numberRequests);
-    
+            
                     editTitleButton.setDisable(false);
-    
+
                     titleOrderIssueColumn.setVisible(true);
-    
+            
                     titleOrdersTable.getItems().setAll(this.getRequests(newSelection.getId(), -9));
                 }
                 else {
+                    currentFullTitle = "";
                     titleTitleText.setText("Multiple Titles");
                     titleProductIdText.setText("-----");
                     titlePriceText.setText("-----");
@@ -1378,7 +1403,7 @@ public class Controller implements Initializable {
                     titleNotesText.setText("-----");
                     titleDateFlagged.setText("-----");
                     titleNumberRequestsText.setText("");
-    
+            
                     boolean oldTitleFlag = false;
                     LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
                     for (Title title: selectedTitles)
@@ -1388,15 +1413,21 @@ public class Controller implements Initializable {
                             break;
                         }
                     }
-    
+            
                     titleDateFlaggedNoticeText.setVisible(oldTitleFlag);
-    
+
                     editTitleButton.setDisable(true);
-    
+
                     titleOrderIssueColumn.setVisible(false);
-    
+
                     getTitleOrders(selectedTitles);
                 }
+            }
+            else {
+                titleTitleText.setText("");
+                titleTitleText.setWrapText(true);
+                titleTitleText.setOnMouseEntered(null);
+                titleTitleText.setOnMouseExited(null);
             }
         });
     
@@ -1460,6 +1491,40 @@ public class Controller implements Initializable {
     
     //#endregion
 
+    @FXML
+    private void handleTitleClick(javafx.scene.input.MouseEvent e) {
+        String full = (currentFullTitle != null && !currentFullTitle.isBlank())
+                ? currentFullTitle
+                : titleTitleText.getText();
+        if (full == null || full.isBlank()) return;
+    
+        Text text = new Text(full);
+        text.setFont(titleTitleText.getFont());
+        text.setFill(titleTitleText.getTextFill());
+    
+        Insets pad = new Insets(16, 24, 16, 24);
+        StackPane content = new StackPane(text);
+        content.setPadding(pad);
+        content.setStyle("-fx-background-color: transparent;");
+    
+        text.wrappingWidthProperty().bind(
+            content.widthProperty().subtract(pad.getLeft() + pad.getRight())
+        );
+    
+        Stage dialog = new Stage(StageStyle.DECORATED);
+        dialog.setTitle("Full Title");
+        dialog.initOwner(((Node) e.getSource()).getScene().getWindow());
+        dialog.initModality(Modality.NONE);
+        dialog.setResizable(true);
+    
+        dialog.setScene(new Scene(content));
+        dialog.setMinWidth(300);
+        dialog.setMinHeight(120);
+        dialog.setWidth(900);
+        dialog.sizeToScene();
+        dialog.show();
+    }
+    
 /*######################################################################/
 ///////////////////////////// FXML Functions ////////////////////////////
 /######################################################################*/
@@ -3085,10 +3150,13 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    public void handleTitleSearchDouble(MouseEvent event)
+    private void handleTitleSearchDouble(MouseEvent e)
     {
-        if (event.getClickCount() == 2) {
-            titleTable.getItems().setAll(getTitles());
+        if (e.getClickCount() >= 2) {
+            TextField tf = (TextField) e.getSource();
+            tf.selectAll();
+            e.consume();
+            return;
         }
     }
 
