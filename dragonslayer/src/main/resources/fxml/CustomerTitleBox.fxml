@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="reactivateRelationshipButton" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="reactivateRelationshipButton" minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
    </padding>
@@ -27,7 +27,7 @@
             </Text>
             <!-- Acts as a spacer -->
             <Region HBox.hgrow="ALWAYS" />
-            <ToggleButton fx:id="showAllButton" mnemonicParsing="false" text="Show All Customers" />
+            <ToggleButton fx:id="showAllButton" mnemonicParsing="false" text="Show Active Customers" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
@@ -43,7 +43,7 @@
             <Insets />
          </VBox.margin>
       </HBox>
-      <TableView fx:id="customerTitleTable" prefHeight="300.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+      <TableView fx:id="customerTitleTable" prefHeight="400.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="customerColumn" minWidth="150.0" prefWidth="150.0" text="Customer" />
           <TableColumn fx:id="titleColumn" minWidth="200.0" prefWidth="200.0" text="Title" />
@@ -52,7 +52,7 @@
             <TableColumn fx:id="statusColumn" minWidth="-1.0" text="Status" />
         </columns>
       </TableView>
-      <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="200.0" spacing="10.0">
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
             <Button fx:id="removeRelationshipButton" mnemonicParsing="false" text="Remove Relationship" />
