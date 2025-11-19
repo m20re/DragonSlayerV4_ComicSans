@@ -53,6 +53,7 @@ public class CreateDB {
                         PRIMARY KEY (CustomerID)
                     )""");
             System.out.println("Created table Customer");
+
             s.execute("""
                     CREATE TABLE Titles
                     (
@@ -68,6 +69,18 @@ public class CreateDB {
                         PRIMARY KEY (TitleID)
                     )""");
             System.out.println("Created table Title");
+
+            s.execute("""
+                    CREATE TABLE CustomerTitles
+                    (
+                        CustomerID int NOT NULL REFERENCES Customers(CustomerID),
+                        TitleID int NOT NULL REFERENCES Titles(TitleID),
+                        DateAdded date,
+                        DateRemoved date,
+                        PRIMARY KEY (CustomerID, TitleID)
+                    )""");
+            System.out.println("Created table CustomerTitles");
+
             s.execute("""
                     CREATE TABLE Orders
                     (
