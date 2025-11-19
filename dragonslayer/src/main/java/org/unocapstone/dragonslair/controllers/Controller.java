@@ -3330,6 +3330,7 @@ public class Controller implements Initializable {
     /**
      * Creates a connection to the database and sets the global conn variable.
      */
+    /* TODO: Add robust database creation handling */
     private void createConnection() {
         try {
             conn = DriverManager.getConnection("jdbc:derby:" + settings.getSetting("dbLocation"));

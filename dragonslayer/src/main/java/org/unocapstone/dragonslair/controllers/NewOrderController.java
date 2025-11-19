@@ -130,6 +130,11 @@ public class NewOrderController implements Initializable{
                 orderWasAdded = true;
                 lastTitleAdded = titleID;
 
+                // add the customer to the CustomerTitle relationship
+                if(NewCustomerTitleController.handleNewCustomerTitleOrder(conn, customerId, titleID)) {
+                    System.out.println("Succesfully added relationship!");
+                }
+
                 Log.LogEvent("New Order", "Added order - Customer: " + customer + " - Title: " + FxUtilTest.getComboBoxValue(setTitle) + " - Quantity: " + quantity + " - Issue: " + (issue == null ? null : Integer.valueOf(issue)));
             } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
