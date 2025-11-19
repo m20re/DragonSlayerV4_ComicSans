@@ -1595,7 +1595,7 @@ public class Controller implements Initializable {
                 if (newTitleController.titleWasAdded)
                 {
                     invalidateTitles();
-                    titleTable.getItems().setAll(getTitles());
+                    titleTable.setItems(getTitles());
                     this.loadReportsTab();
                 }
             });
@@ -4186,4 +4186,3 @@ public class Controller implements Initializable {
         s.close();;
     }
 }
-
