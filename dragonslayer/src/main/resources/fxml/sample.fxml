@@ -153,6 +153,7 @@
                 <TableColumn fx:id="titleProductIdColumn" editable="false" prefWidth="100.0" text="Product ID" />
                 <TableColumn fx:id="titlePriceColumn" editable="false" prefWidth="100.0" text="Price" />
                 <TableColumn fx:id="titleDateCreatedColumn" editable="false" prefWidth="100.0" text="Date Created" />
+                <TableColumn fx:id="titleLastFlaggedColumn" editable="false" prefWidth="100.0" text="Last Flagged" />
                 <TableColumn fx:id="titleNotesColumn" editable="false" prefWidth="100.0" text="Notes" />
               </columns>
             </TableView>
