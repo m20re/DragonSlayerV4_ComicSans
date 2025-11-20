@@ -97,6 +97,7 @@ public class Controller implements Initializable {
     @FXML private TableColumn<Title, String> titleProductIdColumn;
     @FXML private TableColumn<Title, String> titlePriceColumn;
     @FXML private TableColumn<Title, String> titleDateCreatedColumn;
+    @FXML private TableColumn<Title, String> titleLastFlaggedColumn;
     @FXML private TableColumn<Title, String> titleNotesColumn;
 
     @FXML private TableView<Order> customerOrderTable;
@@ -1014,6 +1015,7 @@ public class Controller implements Initializable {
 
             copy.flaggedProperty().addListener((obs, wasFlagged, isFlagged) -> {
                 if (isFlagged) {
+                    t.setDateFlagged(LocalDate.now());
                     saveThisFlag(copy);
                     try {
                         Statement s = conn.createStatement();
@@ -1051,6 +1053,7 @@ public class Controller implements Initializable {
                     this.unsaved = true;
                 }
                 if (!isFlagged && wasFlagged) {
+                    t.setDateFlagged(null);
                     this.unsaved = true;
                     unsaveThisFlag(copy);
                 }
@@ -1190,6 +1193,14 @@ public class Controller implements Initializable {
             }
         });
         titleDateCreatedColumn.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
+        titleLastFlaggedColumn.setCellValueFactory(cell -> {
+            LocalDate flaggedDate = cell.getValue().getDateFlagged();
+            if (flaggedDate != null) {
+                return new SimpleStringProperty(flaggedDate.toString());
+            } else {
+                return new SimpleStringProperty("Never");
+            }
+        });
         titleNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
         titleTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         titleTable.setRowFactory(title -> new TableRow<Title>() {
@@ -3580,20 +3591,19 @@ public class Controller implements Initializable {
      * @param workbook the workbook to save
      */
     private void saveReport(File file, Workbook workbook) {
-        Alert savingAlert = new Alert(Alert.AlertType.INFORMATION, "Saving Report", ButtonType.OK);
-        try {
-            savingAlert.setTitle("Saving");
+        /*Alert savingAlert = new Alert(Alert.AlertType.INFORMATION, "Saving Report", ButtonType.OK);*/
+        try (FileOutputStream outputStream = new FileOutputStream(file)){
+            /*savingAlert.setTitle("Saving");
             savingAlert.setHeaderText("");
             savingAlert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             savingAlert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
-            savingAlert.show();
+            savingAlert.show();*/
 
-            FileOutputStream outputStream = new FileOutputStream(file);
             workbook.write(outputStream);
             workbook.close();
-            outputStream.close();
+            /*outputStream.close();*/
 
-            savingAlert.close();
+            /*savingAlert.close();*/
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Report saved successfully!", ButtonType.OK);
             alert.setTitle("File Saved");
             alert.setHeaderText("");
@@ -3602,10 +3612,11 @@ public class Controller implements Initializable {
             Log.LogEvent("Report Saved", "Saved a report to: " + file.getAbsolutePath());
 
         } catch (Exception e) {
-            savingAlert.close();
+            /*savingAlert.close();*/
             Alert alert = new Alert(Alert.AlertType.ERROR, "Error writing to file. Report may not have saved successfully. Make sure the file is not in use by another program.", ButtonType.OK);
             alert.setTitle("Save Error");
             alert.show();
+            Log.LogEvent("Save Error", e.getMessage());
         }
     }
 
@@ -3898,6 +3909,7 @@ public class Controller implements Initializable {
     
                 t.flaggedProperty().addListener((obs, wasFlagged, isFlagged) -> {
                     if (isFlagged) {
+                        t.setDateFlagged(LocalDate.now());
                         saveThisFlag(t);
                         try (Statement s2 = conn.createStatement();
                              ResultSet results2 = s2.executeQuery(
@@ -3911,6 +3923,7 @@ public class Controller implements Initializable {
                         }
                         this.unsaved = true;
                     } else if (wasFlagged) {
+                        t.setDateFlagged(null);
                         this.unsaved = true;
                         unsaveThisFlag(t);
                     }
