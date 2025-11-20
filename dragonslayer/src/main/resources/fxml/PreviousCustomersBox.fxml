@@ -16,7 +16,7 @@
 <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="700.0" 
       xmlns="http://javafx.com/javafx/21.0.8" 
       xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="org.unocapstone.dragonslair.controllers.CustomerTitleController">
+      fx:controller="org.unocapstone.dragonslair.controllers.PreviousCustomersController">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
    </padding>

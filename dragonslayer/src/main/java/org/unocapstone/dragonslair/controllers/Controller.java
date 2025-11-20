@@ -3302,6 +3302,35 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    void handlePreviousCustomersButton() {
+        // TODO: Finish this
+        // if (titleTable.getSelectionModel().getSelectedItem() == null) {
+
+        // }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/PreviousCustomersBox.fxml"));
+            Parent root = fxmlLoader.load();
+
+            PreviousCustomersController previousCustomersController = fxmlLoader.getController();
+            previousCustomersController.setConnection(conn);
+
+            Stage window = new Stage();
+            window.initModality(Modality.APPLICATION_MODAL); // blocks events from being delivered to other windows
+            window.setTitle("Previous Customers");
+            window.setResizable(false);
+            window.setHeight(500);
+            window.setWidth(700);
+            window.setScene(new Scene(root));
+            window.setOnHidden(null); // Don't know yet...
+            window.show();
+
+        } catch (Exception e) {
+            AlertBox.display("ERROR", "Error when opening window. This is probably a bug");
+            e.printStackTrace();
+        }
+    }
     //#endregion
 
 /*######################################################################/
