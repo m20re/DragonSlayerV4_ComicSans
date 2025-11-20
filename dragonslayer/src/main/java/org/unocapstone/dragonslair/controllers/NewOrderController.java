@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 
 import org.unocapstone.dragonslair.FxUtilTest;
 import org.unocapstone.dragonslair.Log;
+import org.unocapstone.dragonslair.NewCustomerTitleManager;
 import org.unocapstone.dragonslair.Title;
 
 /**
@@ -131,7 +132,7 @@ public class NewOrderController implements Initializable{
                 lastTitleAdded = titleID;
 
                 // add the customer to the CustomerTitle relationship
-                if(NewCustomerTitleController.handleNewCustomerTitleOrder(conn, customerId, titleID)) {
+                if(NewCustomerTitleManager.handleNewCustomerTitleOrder(conn, customerId, titleID)) {
                     System.out.println("Succesfully added relationship!");
                 }
 
