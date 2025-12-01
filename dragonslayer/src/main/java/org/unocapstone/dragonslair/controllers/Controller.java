@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -29,9 +28,6 @@ import javafx.stage.StageStyle;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Screen;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -3468,7 +3464,21 @@ public class Controller implements Initializable {
             window.setHeight(500);
             window.setWidth(700);
             window.setScene(new Scene(root));
-            window.setOnHidden(null); // Don't know yet...
+            window.setOnHidden(e -> {
+                // Refresh customer and title data to reflect any relationship changes
+                invalidateCustomers();
+                customerTable.getItems().setAll(getCustomers());
+
+                // If any customers are currently selected, refresh their orders display
+                ObservableList<Customer> selectedCustomers = customerTable.getSelectionModel().getSelectedItems();
+                if (selectedCustomers != null && !selectedCustomers.isEmpty()) {
+                    if (selectedCustomers.size() == 1) {
+                        updateOrdersTable(selectedCustomers.get(0));
+                    } else {
+                        updateOrdersTable(selectedCustomers);
+                    }
+                }
+            });
             window.show();
 
         } catch (Exception e) {
