@@ -497,6 +497,31 @@ public class Controller implements Initializable {
                 return false;
             }
         }
+
+        // make sure that CustomerTitles exists
+        try {
+            sql = """
+                    CREATE TABLE CustomerTitles
+                    (
+                        CustomerID int NOT NULL REFERENCES Customers(CustomerID),
+                        TitleID int NOT NULL REFERENCES Titles(TitleID),
+                        DateAdded date,
+                        DateRemoved date,
+                        PRIMARY KEY (CustomerID, TitleID)
+                    )""";
+            s = conn.createStatement();
+            s.execute(sql);
+            System.out.println("Created CustomerTitles junction table");
+        } catch (SQLException sqlExcept) {
+            if (sqlExcept.getSQLState().equals("X0Y32")) {
+                System.out.println("Customer table already contains CustomerTitle");
+            } else {
+                Log.LogEvent("SQL Exception", sqlExcept.getMessage());
+                sqlExcept.printStackTrace();
+                return false;
+            }
+        }
+
         System.out.println("DATABASE SCHEMA UP TO-DATE");
         return true;
     }
