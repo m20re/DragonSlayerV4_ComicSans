@@ -242,28 +242,48 @@
               </children>
             </VBox>
             <TextField fx:id="TitleSearch" layoutX="10.0" layoutY="44.0" onKeyReleased="#handleTitleSearching" onMouseClicked="#handleTitleSearchDouble" prefHeight="26.0" prefWidth="690.0" promptText="Search..." />
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus" prefHeight="30.0" prefWidth="690.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
-              <children>
-                <Button fx:id="addTitleButtonMain" mnemonicParsing="false" onAction="#handleAddTitle" prefWidth="94.0" text="Add New Title" />
-                <Button fx:id="resetFlagsButton" mnemonicParsing="false" onAction="#resetFlags" prefWidth="154.0" text="Reset New Release Flags">
-                  <HBox.margin>
-                    <Insets left="5.0" />
-                  </HBox.margin>
-                </Button>
-                <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#handleEditTitle" prefWidth="60.0" text="Edit">
-                  <HBox.margin>
-                    <Insets left="235.0" />
-                  </HBox.margin>
-                </Button>
-                <Button fx:id="deleteTitleButton" mnemonicParsing="false" onAction="#handleDeleteTitle" prefWidth="60.0" text="Delete">
-                  <HBox.margin>
-                    <Insets left="5.0" />
-                  </HBox.margin>
-                </Button>
-              </children>
-              <opaqueInsets>
-                <Insets />
-              </opaqueInsets>
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0"
+                  nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus"
+                  prefHeight="30.0" prefWidth="690.0"
+                  AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+                <children>
+                    <Button fx:id="addTitleButtonMain" mnemonicParsing="false"
+                            onAction="#handleAddTitle"
+                            prefWidth="94.0" text="Add New Title" />
+
+                    <Button fx:id="resetFlagsButton" mnemonicParsing="false"
+                            onAction="#resetFlags"
+                            prefWidth="154.0" text="Reset New Release Flags">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button mnemonicParsing="false"
+                            onAction="#refreshAll"
+                            prefWidth="140.0"
+                            text="Refresh All Data">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button fx:id="editTitleButton" mnemonicParsing="false"
+                            onAction="#handleEditTitle"
+                            prefWidth="60.0" text="Edit">
+                        <HBox.margin>
+                            <Insets left="110.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button fx:id="deleteTitleButton" mnemonicParsing="false"
+                            onAction="#handleDeleteTitle"
+                            prefWidth="60.0" text="Delete">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                </children>
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
             </HBox>
           </children></AnchorPane>
       </content>
