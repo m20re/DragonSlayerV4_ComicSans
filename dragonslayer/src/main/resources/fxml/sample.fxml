@@ -80,35 +80,41 @@
                         <TableColumn fx:id="customerOrderIssueColumn" prefWidth="75.0" text="Issue" />
                       </columns>
                     </TableView>
-                    <VBox alignment="TOP_CENTER" onMouseClicked="#passCustomerKeyboardFocus" prefHeight="200.0" prefWidth="100.0">
+                    <VBox alignment="TOP_CENTER" onMouseClicked="#passCustomerKeyboardFocus" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                       <children>
                         <Button fx:id="newOrderButton" mnemonicParsing="false" onAction="#handleNewOrder" prefWidth="100.0" text="Add Request" wrapText="true">
                           <VBox.margin>
-                            <Insets bottom="20.0" top="5.0" />
+                            <Insets />
                           </VBox.margin>
-                          <font>
-                            <Font size="11.0" />
-                          </font>
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
                         </Button>
                         <Button fx:id="deleteOrderButton" mnemonicParsing="false" onAction="#handleDeleteOrder" prefWidth="100.0" text="Delete Selected" wrapText="true">
-                          <font>
-                            <Font size="11.0" />
-                          </font>
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
                         </Button>
                         <Button fx:id="editOrderButton" mnemonicParsing="false" onAction="#handleEditOrder" prefWidth="100.0" text="Edit Selected" wrapText="true">
                           <font>
                             <Font size="11.0" />
                           </font>
                           <VBox.margin>
-                            <Insets top="5.0" />
+                            <Insets />
                           </VBox.margin>
                         </Button>
+                                    <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#handlePreviousTitlesButton" text="Show Previous Titles" wrapText="true">
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
+                                    </Button>
                         <Button fx:id="exportSingleCustomerListButton" mnemonicParsing="false" onAction="#handleExportSingleCustomer" prefWidth="100.0" text="Export Single Customer List" wrapText="true">
                           <font>
                             <Font size="11.0" />
                           </font>
                           <VBox.margin>
-                            <Insets top="348.5" />
+                            <Insets />
                           </VBox.margin>
                         </Button>
                       </children>
@@ -208,23 +214,16 @@
                     </TableView>
                      <VBox onMouseClicked="#passTitleKeyboardFocus" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                         <children>
-                           <VBox alignment="CENTER" spacing="8.0">
-                              <children>
-                                 <Button fx:id="addRequestButton" mnemonicParsing="false" onAction="#handleAddRequest" prefWidth="100.0" text="Add">
-                                    <font>
-                                       <Font size="11.0" />
-                                    </font>
-                                 </Button>
-                                 <Button fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#handleDeleteRequest" prefWidth="100.0" text="Delete">
-                                    <font>
-                                       <Font size="11.0" />
-                                    </font>
-                                 </Button>
-                        </children>
-                                       <padding>
-                                          <Insets top="20.0" />
-                                       </padding>
-                     </VBox>
+                           <Button fx:id="addRequestButton" mnemonicParsing="false" onAction="#handleAddRequest" prefWidth="100.0" text="Add">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Button>
+                           <Button fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#handleDeleteRequest" prefWidth="100.0" text="Delete">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Button>
                                     <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                                     <Button mnemonicParsing="false" onAction="#handlePreviousCustomersButton" prefWidth="100.0" text="Show Previous Customers" wrapText="true" />
 

@@ -3363,25 +3363,31 @@ public class Controller implements Initializable {
         }
     }
 
-    // Handles the raw click of the button
     @FXML
     void handlePreviousCustomersButton() {
-        // prevent multiple selections
-        int customerCount = customerTable.getSelectionModel().getSelectedItems().size();
         int titleCount = titleTable.getSelectionModel().getSelectedItems().size();
 
-        if (customerCount > 1) { AlertBox.display("Error", "Select only ONE Customer"); return;}
         if (titleCount > 1) { AlertBox.display("Error", "Select only ONE Title"); return;}
-        if (customerCount == 1 | titleCount == 1) {
-            Customer selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
+        if (titleCount == 1) {
             Title selectedTitle = titleTable.getSelectionModel().getSelectedItem();            
-            
-            // get ID or NULL otherwise
-            Integer customerId = (selectedCustomer != null) ? selectedCustomer.getId() : null;
             Integer titleId = (selectedTitle != null) ? selectedTitle.getId() : null;
-            openPreviousCustomersWindow(customerId, titleId);
+            openPreviousCustomersWindow(null, titleId);
         } else {
-            // default to NULL
+            // default to NULL values
+            openPreviousCustomersWindow(null, null);
+        }
+    }
+
+    @FXML
+    void handlePreviousTitlesButton() {
+        int customerCount = customerTable.getSelectionModel().getSelectedItems().size();
+
+        if (customerCount > 1) { AlertBox.display("Error", "Select only ONE Title"); return;}
+        if (customerCount == 1) {
+            Customer selectedTitle = customerTable.getSelectionModel().getSelectedItem();            
+            Integer customerID = (selectedTitle != null) ? selectedTitle.getId() : null;
+            openPreviousCustomersWindow(customerID, null);
+        } else {
             openPreviousCustomersWindow(null, null);
         }
     }
