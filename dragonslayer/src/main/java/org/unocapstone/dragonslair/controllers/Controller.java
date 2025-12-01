@@ -3363,17 +3363,47 @@ public class Controller implements Initializable {
         }
     }
 
+    // Handles the raw click of the button
     @FXML
     void handlePreviousCustomersButton() {
-        // TODO: Finish this
-        // if (titleTable.getSelectionModel().getSelectedItem() == null) {
+        // prevent multiple selections
+        int customerCount = customerTable.getSelectionModel().getSelectedItems().size();
+        int titleCount = titleTable.getSelectionModel().getSelectedItems().size();
 
-        // }
+        if (customerCount > 1) { AlertBox.display("Error", "Select only ONE Customer"); return;}
+        if (titleCount > 1) { AlertBox.display("Error", "Select only ONE Title"); return;}
+        if (customerCount == 1 | titleCount == 1) {
+            Customer selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
+            Title selectedTitle = titleTable.getSelectionModel().getSelectedItem();            
+            
+            // get ID or NULL otherwise
+            Integer customerId = (selectedCustomer != null) ? selectedCustomer.getId() : null;
+            Integer titleId = (selectedTitle != null) ? selectedTitle.getId() : null;
+            openPreviousCustomersWindow(customerId, titleId);
+        } else {
+            // default to NULL
+            openPreviousCustomersWindow(null, null);
+        }
+    }
+
+    /**
+     * Opens the Previous Customers window
+     * @param customerId Optional customer ID to filter by (can be null)
+     * @param titleId Optional title ID to filter by (can be null)
+     */
+    private void openPreviousCustomersWindow(Integer customerId, Integer titleId) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/PreviousCustomersBox.fxml"));
             Parent root = fxmlLoader.load();
-
             PreviousCustomersController previousCustomersController = fxmlLoader.getController();
+
+            if (customerId != null) {
+                previousCustomersController.setPreselectedCustomer(customerId);
+            }
+            if (titleId != null) {
+                previousCustomersController.setPreselectedTitle(titleId);
+            }
+
             previousCustomersController.setConnection(conn);
 
             Stage window = new Stage();
@@ -3391,6 +3421,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
     }
+
     //#endregion
 
 /*######################################################################/
