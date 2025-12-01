@@ -105,7 +105,9 @@ public class PreviousCustomersController implements Initializable {
                 allRecords.add(record);
             }
             
-            statusLabel.setText("Data loaded successfully");
+            customerTitleTable.setItems(allRecords);
+            statusLabel.setText("Data loaded successfully!");
+            recordStatusLabel.setText(allRecords.size() + " Records");
             
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception - Load CustomerTitles", e.getMessage());

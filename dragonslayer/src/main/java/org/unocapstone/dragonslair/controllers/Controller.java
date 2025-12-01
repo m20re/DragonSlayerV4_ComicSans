@@ -512,6 +512,7 @@ public class Controller implements Initializable {
             s = conn.createStatement();
             s.execute(sql);
             System.out.println("Created CustomerTitles junction table");
+            
         } catch (SQLException sqlExcept) {
             if (sqlExcept.getSQLState().equals("X0Y32")) {
                 System.out.println("Customer table already contains CustomerTitle");
@@ -520,6 +521,29 @@ public class Controller implements Initializable {
                 sqlExcept.printStackTrace();
                 return false;
             }
+        }
+
+        // migrate data at-once
+        try {
+            sql = """
+                INSERT INTO CustomerTitles (CustomerID, TitleID, DateAdded)
+                SELECT DISTINCT CustomerID, TitleID, CURRENT_DATE
+                FROM Orders
+                WHERE CustomerID IS NOT NULL AND TitleID IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1 FROM CustomerTitles ct 
+                    WHERE ct.CustomerID = Orders.CustomerID 
+                    AND ct.TitleID = Orders.TitleID
+                )""";
+            s = conn.createStatement();
+            int rowsInserted = s.executeUpdate(sql);
+            if (rowsInserted > 0) {
+                System.out.println("Migrated " + rowsInserted + " customer-title relationships");
+            }
+        } catch (SQLException sqlExcept) {
+            Log.LogEvent("SQL Exception during CustomerTitles migration", sqlExcept.getMessage());
+            sqlExcept.printStackTrace();
+            // no return, as table creation is more important
         }
 
         System.out.println("DATABASE SCHEMA UP TO-DATE");
