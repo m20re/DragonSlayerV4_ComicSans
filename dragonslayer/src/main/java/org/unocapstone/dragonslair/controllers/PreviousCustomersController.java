@@ -36,7 +36,7 @@ public class PreviousCustomersController implements Initializable {
     @FXML TableColumn<CustomerTitleRecord, String>  statusColumn;
     
     @FXML Label statusLabel;
-    @FXML Label recordStatusLabel;
+    @FXML Label recordCountStatusLabel;
     
     private Connection conn;
     private ObservableList<CustomerTitleRecord> allRecords = FXCollections.observableArrayList();
@@ -139,10 +139,7 @@ public class PreviousCustomersController implements Initializable {
             populateComboBoxes();
 
             // Apply preselected filters if they were set from main GUI
-            applyPreselectedFilters();
-            statusLabel.setText("Data loaded successfully!");
-            recordStatusLabel.setText(allRecords.size() + " Records");
-            
+            applyPreselectedFilters();            
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception - Load CustomerTitles", e.getMessage());
             e.printStackTrace();
@@ -180,29 +177,79 @@ public class PreviousCustomersController implements Initializable {
      * Applies the filters if selected from the main GUI
      */
     private void applyPreselectedFilters() {
+        boolean customerFound = false;
+        boolean titleFound = false;
+        String customerName = null;
+        String titleName = null;
+
+        // Check if preselected customer exists in the records
         if (preselectedCustomerId != null) {
-            // Find the customer name that matches this ID (might be slow)
             for (CustomerTitleRecord record : allRecords) {
                 if (record.getCustomerId() == preselectedCustomerId) {
-                    // Set the combo box to this customer's name and stop the search
-                    customerTitleBox.setValue(record.getCustomerName());
+                    customerName = record.getCustomerName();
+                    customerTitleBox.setValue(customerName);
+                    customerFound = true;
                     break;
                 }
             }
         }
 
+        // Check if preselected title exists in the records
         if (preselectedTitleId != null) {
-            // Find the title name that matches this ID
             for (CustomerTitleRecord record : allRecords) {
                 if (record.getTitleId() == preselectedTitleId) {
-                    titleComboBox.setValue(record.getTitleName());
+                    titleName = record.getTitleName();
+                    titleComboBox.setValue(titleName);
+                    titleFound = true;
                     break;
                 }
             }
         }
 
+        // Apply filters if something was preselected
         if (preselectedCustomerId != null || preselectedTitleId != null) {
             applyFilters();
+
+            // Get the filtered count to display
+            int filteredCount = filteredRecords.size();
+
+            // Update status label with relevant errors or conditions
+            if (preselectedCustomerId != null && !customerFound) {
+                statusLabel.setText("No title relationships found for selected customer");
+                statusLabel.setStyle("-fx-text-fill: red;");
+            } else if (preselectedTitleId != null && !titleFound) {
+                statusLabel.setText("No customer relationships found for selected title");
+                statusLabel.setStyle("-fx-text-fill: red;");
+            } else if (filteredRecords.isEmpty()) {
+                // Filtered but got no results (shouldn't happen if found, but just in case)
+                if (customerName != null && titleName != null) {
+                    statusLabel.setText("No relationship found between " + customerName + " and " + titleName);
+                } else if (customerName != null) {
+                    statusLabel.setText("No titles found for " + customerName);
+                } else if (titleName != null) {
+                    statusLabel.setText("No customers found for " + titleName);
+                }
+                statusLabel.setStyle("-fx-text-fill: red;");
+            } else {
+                // Successfully filtered and found results
+                if (customerName != null && titleName != null) {
+                    statusLabel.setText("Showing relationship: " + customerName + " ↔ " + titleName);
+                } else if (customerName != null) {
+                    statusLabel.setText("Showing all titles for: " + customerName);
+                } else if (titleName != null) {
+                    statusLabel.setText("Showing all customers for: " + titleName);
+                }
+                statusLabel.setStyle("-fx-text-fill: black;");
+            }
+
+            // Update record count label to show the filtered count
+            recordCountStatusLabel.setText(filteredCount + " Records");
+            // Make record count red if zero, otherwise black
+            if (filteredCount == 0) {
+                recordCountStatusLabel.setStyle("-fx-text-fill: red;");
+            } else {
+                recordCountStatusLabel.setStyle("-fx-text-fill: black;");
+            }
         }
     }
 
@@ -256,7 +303,7 @@ public class PreviousCustomersController implements Initializable {
         });
 
         // Update the record count label to show filtered results
-        recordStatusLabel.setText(filteredRecords.size() + " Records (filtered from " + allRecords.size() + ")");
+        recordCountStatusLabel.setText(filteredRecords.size() + " Records (filtered from " + allRecords.size() + ")");
     }
 
     /**
@@ -270,7 +317,7 @@ public class PreviousCustomersController implements Initializable {
         // Turn off the active-only toggle
         showActiveButton.setSelected(false);
         filteredRecords.setPredicate(p -> true);
-        recordStatusLabel.setText(allRecords.size() + " Records");
+        recordCountStatusLabel.setText(allRecords.size() + " Records");
     }
     
     @FXML

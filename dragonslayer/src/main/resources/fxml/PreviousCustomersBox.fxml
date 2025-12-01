@@ -13,10 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="700.0" 
-      xmlns="http://javafx.com/javafx/21.0.8" 
-      xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="org.unocapstone.dragonslair.controllers.PreviousCustomersController">
+<VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.PreviousCustomersController">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
    </padding>
@@ -30,7 +27,7 @@
             </Text>
             <!-- Acts as a spacer -->
             <Region HBox.hgrow="ALWAYS" />
-            <ToggleButton fx:id="showActiveButton" onAction="#toggleActiveFilter" mnemonicParsing="false" text="Show Active Customers" />
+            <ToggleButton fx:id="showActiveButton" mnemonicParsing="false" onAction="#toggleActiveFilter" text="Show Active Customers" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
@@ -38,9 +35,9 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Title:" />
             <ComboBox fx:id="titleComboBox" onAction="#applyFilters" prefWidth="175.0" promptText="Select a Title!" />
             <Text layoutX="10.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer:" />
-            <ComboBox fx:id="customerTitleBox"  onAction="#applyFilters" layoutX="40.0" layoutY="48.0" prefWidth="175.0" promptText="Select a Customer!" />
+            <ComboBox fx:id="customerTitleBox" layoutX="40.0" layoutY="48.0" onAction="#applyFilters" prefWidth="175.0" promptText="Select a Customer!" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button fx:id="clearButton" onAction="#clearFilters" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Clear Filters" />
+            <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearFilters" prefHeight="25.0" prefWidth="120.0" text="Clear Filters" />
          </children>
          <VBox.margin>
             <Insets />
@@ -58,16 +55,16 @@
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button fx:id="removeRelationshipButton" onAction="#removeRelationship" mnemonicParsing="false" text="Remove Relationship" />
-            <Button fx:id="reactivateRelationshipButton" onAction="#reactivateRelationship" layoutX="552.0" layoutY="44.0" mnemonicParsing="false" text="Reactivate Relationship" />
-            <Button fx:id="closeButton" onAction="#closeWindow" mnemonicParsing="false" text="Close" />
+            <Button fx:id="removeRelationshipButton" mnemonicParsing="false" onAction="#removeRelationship" text="Remove Relationship" />
+            <Button fx:id="reactivateRelationshipButton" layoutX="552.0" layoutY="44.0" mnemonicParsing="false" onAction="#reactivateRelationship" text="Reactivate Relationship" />
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="200.0">
          <children>
             <Label fx:id="statusLabel" text="Ready" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Label fx:id="recordStatusLabel" layoutX="10.0" layoutY="39.0" text="0 Records" />
+            <Label fx:id="recordCountStatusLabel" layoutX="10.0" layoutY="39.0" text="0 Records" />
          </children>
       </HBox>
    </children>
