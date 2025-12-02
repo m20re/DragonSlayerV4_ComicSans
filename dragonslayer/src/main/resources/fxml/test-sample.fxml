@@ -18,10 +18,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.control.Label?>
 
-<TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
+<TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
   <tabs>
     <Tab text="Customers">
       <content>
@@ -82,35 +80,41 @@
                         <TableColumn fx:id="customerOrderIssueColumn" prefWidth="75.0" text="Issue" />
                       </columns>
                     </TableView>
-                    <VBox alignment="TOP_CENTER" onMouseClicked="#passCustomerKeyboardFocus" prefHeight="200.0" prefWidth="100.0">
+                    <VBox alignment="TOP_CENTER" onMouseClicked="#passCustomerKeyboardFocus" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                       <children>
                         <Button fx:id="newOrderButton" mnemonicParsing="false" onAction="#handleNewOrder" prefWidth="100.0" text="Add Request" wrapText="true">
                           <VBox.margin>
-                            <Insets bottom="20.0" top="5.0" />
+                            <Insets />
                           </VBox.margin>
-                          <font>
-                            <Font size="11.0" />
-                          </font>
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
                         </Button>
                         <Button fx:id="deleteOrderButton" mnemonicParsing="false" onAction="#handleDeleteOrder" prefWidth="100.0" text="Delete Selected" wrapText="true">
-                          <font>
-                            <Font size="11.0" />
-                          </font>
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
                         </Button>
                         <Button fx:id="editOrderButton" mnemonicParsing="false" onAction="#handleEditOrder" prefWidth="100.0" text="Edit Selected" wrapText="true">
                           <font>
                             <Font size="11.0" />
                           </font>
                           <VBox.margin>
-                            <Insets top="5.0" />
+                            <Insets />
                           </VBox.margin>
                         </Button>
+                                    <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#handlePreviousTitlesButton" text="Show Previous Titles" wrapText="true">
+                                       <font>
+                                          <Font size="11.0" />
+                                       </font>
+                                    </Button>
                         <Button fx:id="exportSingleCustomerListButton" mnemonicParsing="false" onAction="#handleExportSingleCustomer" prefWidth="100.0" text="Export Single Customer List" wrapText="true">
                           <font>
                             <Font size="11.0" />
                           </font>
                           <VBox.margin>
-                            <Insets top="348.5" />
+                            <Insets />
                           </VBox.margin>
                         </Button>
                       </children>
@@ -184,12 +188,7 @@
                     </Text>
                     <Text fill="#666666" strokeType="OUTSIDE" strokeWidth="0.0" text="Title:" underline="true" GridPane.rowIndex="1" />
                     <Text fill="#666666" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Flagged:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <Label fx:id="titleTitleText"
-                        GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS"
-                        wrapText="true"
-                        textOverrun="WORD_ELLIPSIS"
-                        onMouseClicked="#handleTitleClick"
-                        style="-fx-cursor: hand;"/>
+                    <Label fx:id="titleTitleText" onMouseClicked="#handleTitleClick" style="-fx-cursor: hand;" textOverrun="WORD_ELLIPSIS" wrapText="true" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
                     <Text fx:id="titleDateFlagged" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                     <Text fx:id="titleDateFlaggedNoticeText" fill="#de7d00" strokeType="OUTSIDE" strokeWidth="0.0" text="This Title Has Not Been Flagged in Over Six Months" visible="false" wrappingWidth="105.0" GridPane.columnIndex="1" />
                     <Text fx:id="titleNumberRequestsText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="213.4580078125" GridPane.columnIndex="2" />
@@ -213,38 +212,22 @@
                         <TableColumn fx:id="titleOrderIssueColumn" text="Issue" />
                       </columns>
                     </TableView>
-                     <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" onMouseClicked="#passTitleKeyboardFocus">
+                     <VBox onMouseClicked="#passTitleKeyboardFocus" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                         <children>
-                           <VBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="8.0">
-                              <children>
-                                 <Button fx:id="addRequestButton"
-                                       text="Add"
-                                       prefWidth="100.0"
-                                       mnemonicParsing="false"
-                                       onAction="#handleAddRequest">
-                                    <font>
-                                       <Font size="11.0"/>
-                                    </font>
-                                 </Button>
-                                 <Button fx:id="deleteRequestButton"
-                                       text="Delete"
-                                       prefWidth="100.0"
-                                       mnemonicParsing="false"
-                                       onAction="#handleDeleteRequest">
-                                    <font>
-                                       <Font size="11.0" />
-                                    </font>
-                                 </Button>
-                        </children>
-                     </VBox>
+                           <Button fx:id="addRequestButton" mnemonicParsing="false" onAction="#handleAddRequest" prefWidth="100.0" text="Add">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Button>
+                           <Button fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#handleDeleteRequest" prefWidth="100.0" text="Delete">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Button>
+                                    <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#handlePreviousCustomersButton" prefWidth="100.0" text="Show Previous Customers" wrapText="true" />
 
-                     <Button fx:id="singleTitleReportButton"
-                              alignment="CENTER"
-                              mnemonicParsing="false"
-                              onAction="#handleExportSingleTitle"
-                              prefWidth="100.0"
-                              text="Export Single Title List"
-                              wrapText="true">
+                     <Button fx:id="singleTitleReportButton" alignment="CENTER" mnemonicParsing="false" onAction="#handleExportSingleTitle" prefWidth="100.0" text="Export Single Title List" wrapText="true">
                         <font>
                            <Font size="11.0" />
                         </font>
@@ -259,28 +242,48 @@
               </children>
             </VBox>
             <TextField fx:id="TitleSearch" layoutX="10.0" layoutY="44.0" onKeyReleased="#handleTitleSearching" onMouseClicked="#handleTitleSearchDouble" prefHeight="26.0" prefWidth="690.0" promptText="Search..." />
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus" prefHeight="30.0" prefWidth="690.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
-              <children>
-                <Button fx:id="addTitleButtonMain" mnemonicParsing="false" onAction="#handleAddTitle" prefWidth="94.0" text="Add New Title" />
-                <Button fx:id="resetFlagsButton" mnemonicParsing="false" onAction="#resetFlags" prefWidth="154.0" text="Reset New Release Flags">
-                  <HBox.margin>
-                    <Insets left="5.0" />
-                  </HBox.margin>
-                </Button>
-                <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#handleEditTitle" prefWidth="60.0" text="Edit">
-                  <HBox.margin>
-                    <Insets left="235.0" />
-                  </HBox.margin>
-                </Button>
-                <Button fx:id="deleteTitleButton" mnemonicParsing="false" onAction="#handleDeleteTitle" prefWidth="60.0" text="Delete">
-                  <HBox.margin>
-                    <Insets left="5.0" />
-                  </HBox.margin>
-                </Button>
-              </children>
-              <opaqueInsets>
-                <Insets />
-              </opaqueInsets>
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0"
+                  nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus"
+                  prefHeight="30.0" prefWidth="690.0"
+                  AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+                <children>
+                    <Button fx:id="addTitleButtonMain" mnemonicParsing="false"
+                            onAction="#handleAddTitle"
+                            prefWidth="94.0" text="Add New Title" />
+
+                    <Button fx:id="resetFlagsButton" mnemonicParsing="false"
+                            onAction="#resetFlags"
+                            prefWidth="154.0" text="Reset New Release Flags">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button mnemonicParsing="false"
+                            onAction="#refreshAll"
+                            prefWidth="140.0"
+                            text="Refresh All Data">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button fx:id="editTitleButton" mnemonicParsing="false"
+                            onAction="#handleEditTitle"
+                            prefWidth="60.0" text="Edit">
+                        <HBox.margin>
+                            <Insets left="110.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Button fx:id="deleteTitleButton" mnemonicParsing="false"
+                            onAction="#handleDeleteTitle"
+                            prefWidth="60.0" text="Delete">
+                        <HBox.margin>
+                            <Insets left="5.0" />
+                        </HBox.margin>
+                    </Button>
+                </children>
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
             </HBox>
           </children></AnchorPane>
       </content>
@@ -409,7 +412,7 @@
                                                     <Button mnemonicParsing="false" onAction="#handleExportPendingIssueNumbers" prefWidth="166.0" text="All Pending Issue #'s" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
                                                     <Button mnemonicParsing="false" onAction="#handleExportStalledTitles" prefWidth="166.0" text="Stalled Titles" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                     <Button mnemonicParsing="false" onAction="#handleExportNoRequestTitles" prefWidth="166.0" text="Titles With 0 Requests" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                    <Button mnemonicParsing="false" onAction="#handleDerbyOpen" prefWidth="166.0" text="DerbyDB Folder" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                                    <Button mnemonicParsing="false" onAction="#handleDerbyOpen" prefWidth="166.0" text="DerbyDB Folder!" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
                                                     <Button mnemonicParsing="false" onAction="#handleExportAllTitles" prefWidth="166.0" text="All Titles with Qtys" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                                     <Button mnemonicParsing="false" onAction="#handleExportBackup" prefHeight="26.0" prefWidth="166.0" text="Backup" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Exports" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER">
