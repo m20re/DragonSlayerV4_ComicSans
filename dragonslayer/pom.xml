@@ -268,12 +268,12 @@
 
             <!-- Windows related features 
             !! Does not work with APP_IMAGE, only with MSI !! -->
-            <!-- <winMenu>true</winMenu>
-            <winShortcut>true</winShortcut>  -->
+            <!-- <winMenu>true</winMenu> -->
+            <!-- <winShortcut>true</winShortcut> -->
             <!-- Drop for GUI apps if you don't want a console window: -->
             <!-- <winConsole>false</winConsole> -->
             <!-- Optional: icon -->
-            <!-- <icon>${project.basedir}/icons/app.ico</icon> -->
+            <icon>${project.basedir}/src/main/resources/icon/DragonSlayer.ico</icon>
         </configuration>
         <executions>
             <execution>
