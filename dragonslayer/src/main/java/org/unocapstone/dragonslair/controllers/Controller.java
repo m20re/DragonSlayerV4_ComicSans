@@ -470,6 +470,11 @@ public class Controller implements Initializable {
             return;
         }
 
+        invalidateCustomers();
+        invalidateOrders();
+        customerTable.getItems().setAll(getCustomers());
+        loadReportsTab();
+
         titleOrdersTable.getItems().setAll(getRequests(selectedTitle.getId(), -9));
         String numberRequests = String.format(
                 "This Title Currently has %s Customer Requests",
