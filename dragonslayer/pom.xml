@@ -29,6 +29,14 @@
     <app.main.class>org.unocapstone.dragonslair.Launcher</app.main.class>
     <app.name>DragonSlayer</app.name>
     <app.vendor>UNO Capstone</app.vendor>
+
+    <!-- Make Headless (non-gui) testing the default -->
+    <!-- (Personal notes) 
+    -Dtestfx.headless=true tells TestFX to use headless mode 
+    -Dprism.order=sw forces JavaFX to use software rendering, avoiding GPU usage
+    -Dprism.text=t2k uses a text rendering engine that works the display 
+    -->
+    <test.argLine>-Dtestfx.headless=true -Dprism.order=sw -Dprism.text=t2k</test.argLine>
 </properties>
 
 <!-- Ensures all JUnit 5 files are compatible -->
@@ -126,6 +134,14 @@
         <scope>test</scope>
     </dependency>
 
+    <!-- TestFX Monocle for headless testing -->
+    <dependency>
+        <groupId>org.testfx</groupId>
+        <artifactId>openjfx-monocle</artifactId>
+        <version>17.0.10</version>
+        <scope>test</scope>
+    </dependency>
+
    <!-- Old JUnit -->
     <!-- <dependency>
       <groupId>junit</groupId>
@@ -171,6 +187,7 @@
         <version>${surefire.version}</version>
         <configuration>
             <useModulePath>false</useModulePath>
+            <argLine>${test.argLine}</argLine>
         </configuration>
     </plugin>
 
@@ -344,6 +361,13 @@
             <properties>
                 <jpackage.type>MSI</jpackage.type>
                 <app.version.pkg>4.1.0</app.version.pkg>
+            </properties>
+        </profile>
+        <!-- GUI test profile - override default headless mode -->
+        <profile>
+            <id>gui-test</id>
+            <properties>
+                <test.argLine></test.argLine>
             </properties>
         </profile>
     </profiles>
