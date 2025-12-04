@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.geometry.Insets;
@@ -84,6 +85,8 @@ public class Controller implements Initializable {
 
     private boolean unsaved = false;
     private File defaultFL;
+    // Allows for an injectable function, useful for testing purposes
+    private java.util.function.BiFunction<FileChooser, Window, File> fileChooserProvider = null;
 
     @FXML
     private TableView<Customer> customerTable;
@@ -2613,7 +2616,7 @@ public class Controller implements Initializable {
         fileChooser.setInitialDirectory(defaultFL);
         fileChooser.setTitle("Export Location");
         fileChooser.setInitialFileName(fileName);
-        File file = fileChooser.showSaveDialog(((Node) event.getTarget()).getScene().getWindow());
+        File file = showFileChooser(fileChooser, ((Node) event.getTarget()).getScene().getWindow());
 
         if (file != null) {
             file = addFileExtension(file);
@@ -2649,6 +2652,29 @@ public class Controller implements Initializable {
 
             saveReport(file, workbook);
         }
+    }
+
+    /**
+     * Opens FileChooser dialog with the explicit purpose of overriding behavior for testing
+     * @param fileChooser
+     * @param window
+     * 
+     * @return file - Returns the file chosen with the dialog
+     */
+    public File showFileChooser(FileChooser fileChooser, Window window) {
+        if (fileChooserProvider != null) {
+            return fileChooserProvider.apply(fileChooser, window);
+        }
+        return fileChooser.showSaveDialog(window);
+    }
+
+    /**
+     * Setter to inject function behavior, used for testing
+     * 
+     * @param provider - Essentially a lambda function with FileChooser and Window as the params
+     */
+    public void setFileChooserProvider(java.util.function.BiFunction<FileChooser, Window, File> provider) {
+        this.fileChooserProvider = provider;
     }
 
     /**
