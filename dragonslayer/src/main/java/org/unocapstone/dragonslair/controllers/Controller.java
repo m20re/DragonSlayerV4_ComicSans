@@ -61,115 +61,185 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-
 public class Controller implements Initializable {
 
-/*######################################################################/
-//////////////////////////// Class Variables ////////////////////////////
-/######################################################################*/
+    /*
+     * ######################################################################/
+     * //////////////////////////// Class Variables ////////////////////////////
+     * /######################################################################
+     */
 
     // Path to txt file saving last DB location. Reccommended to leave with program
     private final String LAST_DB_LOCATION_FILE_PATH = "lastDBconnection.txt";
 
-    //Bibash enumeration type
+    // Bibash enumeration type
     public enum CURRENT_PAGE {
         TITLE,
-        CUSTOMER  ;
+        CUSTOMER;
     };
 
     public CURRENT_PAGE currentPage;
 
-    //#region Class Variables
+    // #region Class Variables
 
     private boolean unsaved = false;
     private File defaultFL;
 
-    @FXML private TableView<Customer> customerTable;
-    @FXML private TableColumn<Customer, String> customerLastNameColumn;
-    @FXML private TableColumn<Customer, String> customerFirstNameColumn;
-    @FXML private TableColumn<Customer, String> customerPhoneColumn;
-    @FXML private TableColumn<Customer, String> customerEmailColumn;
-    @FXML private TableColumn<Customer, String> customerNotesColumn;
+    @FXML
+    private TableView<Customer> customerTable;
+    @FXML
+    private TableColumn<Customer, String> customerLastNameColumn;
+    @FXML
+    private TableColumn<Customer, String> customerFirstNameColumn;
+    @FXML
+    private TableColumn<Customer, String> customerPhoneColumn;
+    @FXML
+    private TableColumn<Customer, String> customerEmailColumn;
+    @FXML
+    private TableColumn<Customer, String> customerNotesColumn;
 
-    @FXML private TableView<Title> titleTable;
-    @FXML private TableColumn<Title, Boolean> titleFlaggedColumn;
-    @FXML private TableColumn<Title, String> titleTitleColumn;
-    @FXML private TableColumn<Title, String> titleProductIdColumn;
-    @FXML private TableColumn<Title, String> titlePriceColumn;
-    @FXML private TableColumn<Title, String> titleDateCreatedColumn;
-    @FXML private TableColumn<Title, String> titleLastFlaggedColumn;
-    @FXML private TableColumn<Title, String> titleNotesColumn;
+    @FXML
+    private TableView<Title> titleTable;
+    @FXML
+    private TableColumn<Title, Boolean> titleFlaggedColumn;
+    @FXML
+    private TableColumn<Title, String> titleTitleColumn;
+    @FXML
+    private TableColumn<Title, String> titleProductIdColumn;
+    @FXML
+    private TableColumn<Title, String> titlePriceColumn;
+    @FXML
+    private TableColumn<Title, String> titleDateCreatedColumn;
+    @FXML
+    private TableColumn<Title, String> titleLastFlaggedColumn;
+    @FXML
+    private TableColumn<Title, String> titleNotesColumn;
 
-    @FXML private TableView<Order> customerOrderTable;
-    @FXML private TableColumn<Order, String> customerOrderReqItemsColumn;
-    @FXML private TableColumn<Order, String> customerOrderQuantityColumn;
-    @FXML private TableColumn<Order, String> customerOrderIssueColumn;
+    @FXML
+    private TableView<Order> customerOrderTable;
+    @FXML
+    private TableColumn<Order, String> customerOrderReqItemsColumn;
+    @FXML
+    private TableColumn<Order, String> customerOrderQuantityColumn;
+    @FXML
+    private TableColumn<Order, String> customerOrderIssueColumn;
 
-    @FXML private TableView<FlaggedTable> flaggedTable;  
-    @FXML private TableColumn<FlaggedTable, String> flaggedTitleColumn;             
-    @FXML private TableColumn<FlaggedTable, String> flaggedIssueColumn;             
-    @FXML private TableColumn<FlaggedTable, String> flaggedPriceColumn;             
-    @FXML private TableColumn<FlaggedTable, String> flaggedQuantityColumn;          
-    @FXML private TableColumn<FlaggedTable, String> flaggedNumRequestsColumn;
+    @FXML
+    private TableView<FlaggedTable> flaggedTable;
+    @FXML
+    private TableColumn<FlaggedTable, String> flaggedTitleColumn;
+    @FXML
+    private TableColumn<FlaggedTable, String> flaggedIssueColumn;
+    @FXML
+    private TableColumn<FlaggedTable, String> flaggedPriceColumn;
+    @FXML
+    private TableColumn<FlaggedTable, String> flaggedQuantityColumn;
+    @FXML
+    private TableColumn<FlaggedTable, String> flaggedNumRequestsColumn;
 
-    @FXML private TableView<RequestTable> requestsTable;
-    @FXML private TableColumn<RequestTable, String> requestLastNameColumn;
-    @FXML private TableColumn<RequestTable, String> requestFirstNameColumn;
-    @FXML private TableColumn<RequestTable, Integer> requestQuantityColumn;
+    @FXML
+    private TableView<RequestTable> requestsTable;
+    @FXML
+    private TableColumn<RequestTable, String> requestLastNameColumn;
+    @FXML
+    private TableColumn<RequestTable, String> requestFirstNameColumn;
+    @FXML
+    private TableColumn<RequestTable, Integer> requestQuantityColumn;
 
-    @FXML private TableView<Title> monthlyBreakdownTable;
-    @FXML private TableColumn<Title, String> breakdownTitleColumn;
-    @FXML private TableColumn<Title, String> breakdownQuantityColumn;
-    @FXML private TableColumn<Title, String> breakdownPendingIssueColumn;
-    @FXML private TableColumn<Title, String> breakdownFlaggedColumn;
+    @FXML
+    private TableView<Title> monthlyBreakdownTable;
+    @FXML
+    private TableColumn<Title, String> breakdownTitleColumn;
+    @FXML
+    private TableColumn<Title, String> breakdownQuantityColumn;
+    @FXML
+    private TableColumn<Title, String> breakdownPendingIssueColumn;
+    @FXML
+    private TableColumn<Title, String> breakdownFlaggedColumn;
 
-    @FXML private TableView<RequestTable> titleOrdersTable;
-    @FXML private TableColumn<RequestTable, String> titleOrderLastNameColumn;
-    @FXML private TableColumn<RequestTable, String> titleOrderFirstNameColumn;
-    @FXML private TableColumn<RequestTable, Integer> titleOrderQuantityColumn;
-    @FXML private TableColumn<RequestTable, Integer> titleOrderIssueColumn;
+    @FXML
+    private TableView<RequestTable> titleOrdersTable;
+    @FXML
+    private TableColumn<RequestTable, String> titleOrderLastNameColumn;
+    @FXML
+    private TableColumn<RequestTable, String> titleOrderFirstNameColumn;
+    @FXML
+    private TableColumn<RequestTable, Integer> titleOrderQuantityColumn;
+    @FXML
+    private TableColumn<RequestTable, Integer> titleOrderIssueColumn;
 
-    @FXML private Text customerFirstNameText;
-    @FXML private Text customerLastNameText;
-    @FXML private Text customerPhoneText;
-    @FXML private Text customerEmailText;
-    @FXML private Text customerNotesText;
-    @FXML private Text delinqNoticeText;
+    @FXML
+    private Text customerFirstNameText;
+    @FXML
+    private Text customerLastNameText;
+    @FXML
+    private Text customerPhoneText;
+    @FXML
+    private Text customerEmailText;
+    @FXML
+    private Text customerNotesText;
+    @FXML
+    private Text delinqNoticeText;
 
-    @FXML private Button editCustomerButton;
-    @FXML private Button newOrderButton;
-    @FXML private Button editOrderButton;
-    @FXML private Button deleteOrderButton;
-    @FXML private Button exportSingleCustomerListButton;
+    @FXML
+    private Button editCustomerButton;
+    @FXML
+    private Button newOrderButton;
+    @FXML
+    private Button editOrderButton;
+    @FXML
+    private Button deleteOrderButton;
+    @FXML
+    private Button exportSingleCustomerListButton;
 
-    //@FXML private Text titleTitleText;
-    @FXML private Text titleProductIdText;
-    @FXML private Text titlePriceText;
-    @FXML private Text titleDateCreatedText;
-    @FXML private Text titleNotesText;
-    @FXML private Text titleDateFlagged;
-    @FXML private Text titleDateFlaggedNoticeText;
-    @FXML private Text titleNumberRequestsText;
+    // @FXML private Text titleTitleText;
+    @FXML
+    private Text titleProductIdText;
+    @FXML
+    private Text titlePriceText;
+    @FXML
+    private Text titleDateCreatedText;
+    @FXML
+    private Text titleNotesText;
+    @FXML
+    private Text titleDateFlagged;
+    @FXML
+    private Text titleDateFlaggedNoticeText;
+    @FXML
+    private Text titleNumberRequestsText;
 
-    @FXML private Button editTitleButton;
+    @FXML
+    private Button editTitleButton;
 
-    //for the summary info in "new week pulls" tab in "reports" tab
-    @FXML private Text FlaggedTitlesTotalText;
-    @FXML private Text FlaggedTitlesTotalCustomersText;
-    @FXML private Text FlaggedIssueNumbersText;
-    @FXML private Text FlaggedNoRequestsText;
+    // for the summary info in "new week pulls" tab in "reports" tab
+    @FXML
+    private Text FlaggedTitlesTotalText;
+    @FXML
+    private Text FlaggedTitlesTotalCustomersText;
+    @FXML
+    private Text FlaggedIssueNumbersText;
+    @FXML
+    private Text FlaggedNoRequestsText;
 
-    //for the summary info on a particular flagged title, when clicked
-    @FXML private Text RequestTitleText;
-    @FXML private Text RequestQuantityText;
-    @FXML private Text RequestNumCustomersText;
+    // for the summary info on a particular flagged title, when clicked
+    @FXML
+    private Text RequestTitleText;
+    @FXML
+    private Text RequestQuantityText;
+    @FXML
+    private Text RequestNumCustomersText;
 
-    @FXML private TextField DefaultFileLocation;
-    @FXML private Text actiontarget;
-    @FXML private Text currentDefaultLocation;
+    @FXML
+    private TextField DefaultFileLocation;
+    @FXML
+    private Text actiontarget;
+    @FXML
+    private Text currentDefaultLocation;
 
-    @FXML private TabPane tabsPane;
-    @FXML private TextArea databaseOverview;
+    @FXML
+    private TabPane tabsPane;
+    @FXML
+    private TextArea databaseOverview;
 
     private ObservableList<Customer> storedCustomers;
     private ObservableList<Title> storedTitles = FXCollections.observableArrayList();
@@ -179,18 +249,22 @@ public class Controller implements Initializable {
     private Settings settings;
 
     private FilteredList<Title> filteredTitles;
-    private SortedList<Title>   sortedTitles;
+    private SortedList<Title> sortedTitles;
     private String currentFullTitle = "";
 
-    @FXML private TextField TitleSearch;
-    @FXML private Button addRequestButton;
-    @FXML private Label titleTitleText;    
+    @FXML
+    private TextField TitleSearch;
+    @FXML
+    private Button addRequestButton;
+    @FXML
+    private Label titleTitleText;
 
     // private boolean setAll;
-    //#endregion
+    // #endregion
 
     private ObservableList<Title> getStoredTitlesSafe() {
-        if (storedTitles == null) storedTitles = FXCollections.observableArrayList();
+        if (storedTitles == null)
+            storedTitles = FXCollections.observableArrayList();
         return storedTitles;
     }
 
@@ -250,60 +324,61 @@ public class Controller implements Initializable {
             new Alert(Alert.AlertType.INFORMATION, "Select a title first.").showAndWait();
             return;
         }
-    
+
         ObservableList<RequestTable> selected = titleOrdersTable.getSelectionModel().getSelectedItems();
         if (selected == null || selected.isEmpty()) {
             new Alert(Alert.AlertType.INFORMATION, "Select a name to delete.").showAndWait();
             return;
         }
-    
+
         final String DELETE_WITH_ISSUE = """
-            DELETE FROM ORDERS
-            WHERE TITLEID = ?
-              AND CUSTOMERID IN (
-                    SELECT CUSTOMERID FROM CUSTOMERS
-                    WHERE UPPER(TRIM(LASTNAME))  = ?
-                      AND UPPER(TRIM(FIRSTNAME)) = ?
-              )
-              AND ISSUE = ?
-            """;
-    
+                DELETE FROM ORDERS
+                WHERE TITLEID = ?
+                  AND CUSTOMERID IN (
+                        SELECT CUSTOMERID FROM CUSTOMERS
+                        WHERE UPPER(TRIM(LASTNAME))  = ?
+                          AND UPPER(TRIM(FIRSTNAME)) = ?
+                  )
+                  AND ISSUE = ?
+                """;
+
         final String DELETE_NO_ISSUE = """
-            DELETE FROM ORDERS
-            WHERE TITLEID = ?
-              AND CUSTOMERID IN (
-                    SELECT CUSTOMERID FROM CUSTOMERS
-                    WHERE UPPER(TRIM(LASTNAME))  = ?
-                      AND UPPER(TRIM(FIRSTNAME)) = ?
-              )
-              AND ISSUE IS NULL
-            """;
-    
+                DELETE FROM ORDERS
+                WHERE TITLEID = ?
+                  AND CUSTOMERID IN (
+                        SELECT CUSTOMERID FROM CUSTOMERS
+                        WHERE UPPER(TRIM(LASTNAME))  = ?
+                          AND UPPER(TRIM(FIRSTNAME)) = ?
+                  )
+                  AND ISSUE IS NULL
+                """;
+
         boolean previousAutoCommit = true;
         try {
             previousAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
-    
+
             try (PreparedStatement psWithIssue = conn.prepareStatement(DELETE_WITH_ISSUE);
-                 PreparedStatement psNoIssue   = conn.prepareStatement(DELETE_NO_ISSUE)) {
-    
+                    PreparedStatement psNoIssue = conn.prepareStatement(DELETE_NO_ISSUE)) {
+
                 for (RequestTable r : selected) {
-                    String last  = (r.getRequestLastName()  == null ? "" : r.getRequestLastName()).trim().toUpperCase();
-                    String first = (r.getRequestFirstName() == null ? "" : r.getRequestFirstName()).trim().toUpperCase();
-    
+                    String last = (r.getRequestLastName() == null ? "" : r.getRequestLastName()).trim().toUpperCase();
+                    String first = (r.getRequestFirstName() == null ? "" : r.getRequestFirstName()).trim()
+                            .toUpperCase();
+
                     Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
                     confirm.setTitle("Confirm Deletion");
                     confirm.setHeaderText(null);
                     confirm.setContentText(String.format("Are you sure you want to delete %s %s?", first, last));
-    
+
                     ButtonType yes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
                     ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
                     confirm.getButtonTypes().setAll(yes, cancel);
-    
+
                     if (confirm.showAndWait().orElse(cancel) == cancel) {
                         continue;
                     }
-    
+
                     int issue = 0;
                     if (r.getRequestIssue() != null && !r.getRequestIssue().isBlank()) {
                         try {
@@ -312,7 +387,7 @@ public class Controller implements Initializable {
                             issue = 0;
                         }
                     }
-    
+
                     if (issue > 0) {
                         psWithIssue.clearParameters();
                         psWithIssue.setInt(1, selectedTitle.getId());
@@ -329,20 +404,25 @@ public class Controller implements Initializable {
                     }
                 }
             }
-    
+
             conn.commit();
-    
+
             titleOrdersTable.getItems().setAll(getRequests(selectedTitle.getId(), -9));
             titleNumberRequestsText.setText(
-                    "This Title Currently has " + getNumberRequests(selectedTitle.getId()) + " Customer Requests"
-            );
-    
+                    "This Title Currently has " + getNumberRequests(selectedTitle.getId()) + " Customer Requests");
+
         } catch (SQLException ex) {
-            try { conn.rollback(); } catch (SQLException ignore) {}
+            try {
+                conn.rollback();
+            } catch (SQLException ignore) {
+            }
             new Alert(Alert.AlertType.ERROR,
                     "Could not delete request(s): " + ex.getSQLState() + " : " + ex.getMessage()).showAndWait();
         } finally {
-            try { conn.setAutoCommit(previousAutoCommit); } catch (SQLException ignore) {}
+            try {
+                conn.setAutoCommit(previousAutoCommit);
+            } catch (SQLException ignore) {
+            }
         }
     }
 
@@ -380,28 +460,40 @@ public class Controller implements Initializable {
             String fn = tfFirst.getText() == null ? "" : tfFirst.getText().trim();
 
             int q;
-            try { q = Integer.parseInt(tfQty.getText().trim()); } catch (Exception ex) { q = -1; }
+            try {
+                q = Integer.parseInt(tfQty.getText().trim());
+            } catch (Exception ex) {
+                q = -1;
+            }
             int iss;
-            try { iss = Integer.parseInt(tfIssue.getText().trim()); } catch (Exception ex) { iss = -1; }
+            try {
+                iss = Integer.parseInt(tfIssue.getText().trim());
+            } catch (Exception ex) {
+                iss = -1;
+            }
 
             if (ln.isEmpty() || fn.isEmpty()) {
-                new Alert(Alert.AlertType.INFORMATION, "Please enter both last and first names.", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Please enter both last and first names.", ButtonType.OK)
+                        .showAndWait();
                 e.consume();
                 return;
             }
             if (q <= 0) {
-                new Alert(Alert.AlertType.INFORMATION, "Quantity must be a positive integer.", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Quantity must be a positive integer.", ButtonType.OK)
+                        .showAndWait();
                 e.consume();
                 return;
             }
             if (iss < 0) {
-                new Alert(Alert.AlertType.INFORMATION, "Issue must be 0 or a positive integer.", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Issue must be 0 or a positive integer.", ButtonType.OK)
+                        .showAndWait();
                 e.consume();
             }
         });
 
         Optional<ButtonType> res = dialog.showAndWait();
-        if (res.isEmpty() || res.get() != ButtonType.OK) return;
+        if (res.isEmpty() || res.get() != ButtonType.OK)
+            return;
 
         String lastName = tfLast.getText().trim().toUpperCase();
         String firstName = tfFirst.getText().trim().toUpperCase();
@@ -421,7 +513,8 @@ public class Controller implements Initializable {
             }
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception", e.getMessage());
-            new Alert(Alert.AlertType.ERROR, "Database error while searching for customer.", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Database error while searching for customer.", ButtonType.OK)
+                    .showAndWait();
             return;
         }
 
@@ -444,7 +537,8 @@ public class Controller implements Initializable {
                     psFetch.setString(1, lastName);
                     psFetch.setString(2, firstName);
                     try (ResultSet rs = psFetch.executeQuery()) {
-                        if (rs.next()) customerId = rs.getInt(1);
+                        if (rs.next())
+                            customerId = rs.getInt(1);
                     }
                 } catch (SQLException ex2) {
                     Log.LogEvent("SQL Exception", ex2.getMessage());
@@ -453,7 +547,8 @@ public class Controller implements Initializable {
         }
 
         if (customerId == null) {
-            new Alert(Alert.AlertType.ERROR, "Could not resolve customer ID after insert.", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Could not resolve customer ID after insert.", ButtonType.OK)
+                    .showAndWait();
             return;
         }
 
@@ -485,9 +580,11 @@ public class Controller implements Initializable {
                 getNumberRequests(selectedTitle.getId()));
         titleNumberRequestsText.setText(numberRequests);
     }
-   
+
     /**
-     * Runs after connection is opened to database, checks to make sure database schema is up to date
+     * Runs after connection is opened to database, checks to make sure database
+     * schema is up to date
+     * 
      * @return true if tables up to date, false if error
      */
     private boolean alterTables() {
@@ -500,8 +597,7 @@ public class Controller implements Initializable {
         } catch (SQLException sqlExcept) {
             if (sqlExcept.getSQLState().equals("X0Y32")) {
                 System.out.println("Customer table already contains Notes");
-            }
-            else {
+            } else {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                 sqlExcept.printStackTrace();
                 return false;
@@ -515,8 +611,7 @@ public class Controller implements Initializable {
         } catch (SQLException sqlExcept) {
             if (sqlExcept.getSQLState().equals("X0Y32")) {
                 System.out.println("Titles table already contains ProductId");
-            }
-            else {
+            } else {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                 sqlExcept.printStackTrace();
                 return false;
@@ -530,14 +625,13 @@ public class Controller implements Initializable {
         } catch (SQLException sqlExcept) {
             if (sqlExcept.getSQLState().equals("X0Y32")) {
                 System.out.println("Titles table already contains DateCreated");
-            }
-            else {
+            } else {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                 sqlExcept.printStackTrace();
                 return false;
             }
         }
-        //make sure customers has delinquent
+        // make sure customers has delinquent
         try {
             sql = "ALTER TABLE Customers ADD Delinquent BOOLEAN";
             s = conn.createStatement();
@@ -545,8 +639,7 @@ public class Controller implements Initializable {
         } catch (SQLException sqlExcept) {
             if (sqlExcept.getSQLState().equals("X0Y32")) {
                 System.out.println("Customer table already contains Delinqunt");
-            }
-            else {
+            } else {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                 sqlExcept.printStackTrace();
                 return false;
@@ -556,14 +649,18 @@ public class Controller implements Initializable {
         return true;
     }
 
-/*######################################################################/
-////////////////////////// Getters and Setters //////////////////////////
-/######################################################################*/
+    /*
+     * ######################################################################/
+     * ////////////////////////// Getters and Setters //////////////////////////
+     * /######################################################################
+     */
 
-    //#region Getters and Setters
+    // #region Getters and Setters
 
     /**
-     * Searches the database for whether or not the given title has any pending issue requests
+     * Searches the database for whether or not the given title has any pending
+     * issue requests
+     * 
      * @param titleId the ID of the title to search for
      * @return True is the title has any pending issue requests, false otherwise
      */
@@ -571,8 +668,7 @@ public class Controller implements Initializable {
         boolean pendingIssueRequest = false;
         ResultSet result;
         Statement s = null;
-        try
-        {
+        try {
             String sql = String.format("""
                     SELECT COUNT(*) FROM ORDERS
                     WHERE ISSUE IS NOT NULL AND TITLEID=%s
@@ -581,15 +677,12 @@ public class Controller implements Initializable {
             s = conn.createStatement();
             result = s.executeQuery(sql);
             result.next();
-            if (result.getInt(1) > 0)
-            {
+            if (result.getInt(1) > 0) {
                 pendingIssueRequest = true;
             }
             result.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -599,6 +692,7 @@ public class Controller implements Initializable {
     /**
      * Returns true or false based on if there are unsaved changes to New
      * Release Flags or not.
+     * 
      * @return A boolean for whether or not there are unsaved changes
      */
     public boolean isUnsaved() {
@@ -607,7 +701,9 @@ public class Controller implements Initializable {
 
     /**
      * Gets a list representing all Customers in the database.
-     * If any operations adjust the backing database, invalidateCustomers() should be called.
+     * If any operations adjust the backing database, invalidateCustomers() should
+     * be called.
+     * 
      * @return An ObservableList of Customer objects
      */
     public ObservableList<Customer> getCustomers() {
@@ -615,15 +711,15 @@ public class Controller implements Initializable {
         ObservableList<Customer> customers = FXCollections.observableArrayList();
 
         // Update the customer list if a change has happened to make it invalid.
-        if (storedCustomers == null)
-        {
+        if (storedCustomers == null) {
             invalidateCustomers();
         }
 
-        // For data safety, create a copy of the customer to avoid data modification of the original list.
-        for (Customer c: storedCustomers)
-        {
-            Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(), c.getNotes(), c.getDelinquent());
+        // For data safety, create a copy of the customer to avoid data modification of
+        // the original list.
+        for (Customer c : storedCustomers) {
+            Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(),
+                    c.getNotes(), c.getDelinquent());
             customers.add(copy);
         }
 
@@ -649,8 +745,7 @@ public class Controller implements Initializable {
 
             if (title.getDateFlagged() == null) {
                 titlesNotFlagged++;
-            }
-            else if (title.getDateFlagged().isBefore(sixMonthsAgo)) {
+            } else if (title.getDateFlagged().isBefore(sixMonthsAgo)) {
                 titlesNotFlagged++;
             }
         }
@@ -663,11 +758,14 @@ public class Controller implements Initializable {
                    %s Pending Issue # Requests
                    %s Titles have not been flagged for over six months
                    %s Titles have 0 Customer Requests
-                """, numTitles, numCustomers, specialOrderNotes, issueNumberRequests, titlesNotFlagged, titlesNoRequests));
+                """, numTitles, numCustomers, specialOrderNotes, issueNumberRequests, titlesNotFlagged,
+                titlesNoRequests));
     }
 
     /**
-     * Gets all of the flagged titles and related information to fill the Flagged Table
+     * Gets all of the flagged titles and related information to fill the Flagged
+     * Table
+     * 
      * @return an obeservable lsit of FlaggedTable object with the requested data
      */
     public ObservableList<FlaggedTable> getFlaggedTitles() {
@@ -675,38 +773,35 @@ public class Controller implements Initializable {
         ObservableList<FlaggedTable> flaggedTitles = FXCollections.observableArrayList();
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
 
-            ResultSet results = s.executeQuery("""
-            SELECT TITLEID, TITLE, ISSUE_FLAGGED, PRICE, SUM(QUANTITY) AS QUANTITY, COUNT(CUSTOMERID) AS NUM_REQUESTS FROM (
-                                                                                                                       SELECT TITLES.TITLEID, TITLES.TITLE, TITLES.ISSUE_FLAGGED, ORDERS.CUSTOMERID, ORDERS.ISSUE, TITLES.PRICE, ORDERS.QUANTITY
-                                                                                                                       from TITLES
-                                                                                                                                INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
-                                                                                                                       WHERE TITLES.FLAGGED = true AND (ISSUE = ISSUE_FLAGGED OR ISSUE IS NULL)
-                                                                                                                   ) AS FLAGGED_ORDERS
-            GROUP BY TITLEID, TITLE, PRICE, ISSUE_FLAGGED
-            ORDER BY TITLE
-            """);
-            
-            while(results.next())
-            {
+            ResultSet results = s.executeQuery(
+                    """
+                            SELECT TITLEID, TITLE, ISSUE_FLAGGED, PRICE, SUM(QUANTITY) AS QUANTITY, COUNT(CUSTOMERID) AS NUM_REQUESTS FROM (
+                                                                                                                                       SELECT TITLES.TITLEID, TITLES.TITLE, TITLES.ISSUE_FLAGGED, ORDERS.CUSTOMERID, ORDERS.ISSUE, TITLES.PRICE, ORDERS.QUANTITY
+                                                                                                                                       from TITLES
+                                                                                                                                                INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
+                                                                                                                                       WHERE TITLES.FLAGGED = true AND (ISSUE = ISSUE_FLAGGED OR ISSUE IS NULL)
+                                                                                                                                   ) AS FLAGGED_ORDERS
+                            GROUP BY TITLEID, TITLE, PRICE, ISSUE_FLAGGED
+                            ORDER BY TITLE
+                            """);
+
+            while (results.next()) {
                 int titleId = results.getInt("TITLEID");
                 String title = results.getString("TITLE");
                 int issue = results.getInt("ISSUE_FLAGGED");
-                int price= results.getInt("PRICE");
+                int price = results.getInt("PRICE");
                 int quantity = results.getInt("QUANTITY");
                 int numRequests = results.getInt("NUM_REQUESTS");
 
-                flaggedTitles.add(new FlaggedTable( titleId, title, issue, price, quantity, numRequests));
+                flaggedTitles.add(new FlaggedTable(titleId, title, issue, price, quantity, numRequests));
 
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -715,31 +810,29 @@ public class Controller implements Initializable {
     }
 
     /**
-     * helper method to get the second piece of summary info on "new week pulls" tab: the number of customers the titles are flagged for
+     * helper method to get the second piece of summary info on "new week pulls"
+     * tab: the number of customers the titles are flagged for
      */
-    private int getNumCustomers(){
+    private int getNumCustomers() {
         int numCustomers = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("""
-                SELECT COUNT(*) FROM (
-                        SELECT DISTINCT CUSTOMERID FROM ORDERS
-                        LEFT JOIN TITLES T on ORDERS.TITLEID = T.TITLEID
-                        WHERE FLAGGED = TRUE
-                    ) AS FLAGGED_CUSTOMERS
-            """);
+                        SELECT COUNT(*) FROM (
+                                SELECT DISTINCT CUSTOMERID FROM ORDERS
+                                LEFT JOIN TITLES T on ORDERS.TITLEID = T.TITLEID
+                                WHERE FLAGGED = TRUE
+                            ) AS FLAGGED_CUSTOMERS
+                    """);
 
             results.next();
             numCustomers = results.getInt(1);
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -748,34 +841,33 @@ public class Controller implements Initializable {
     }
 
     /**
-     * helper method to get the third piece of summary info on "new week pulls" tab: the number of titles that have triggered issue #'s
+     * helper method to get the third piece of summary info on "new week pulls" tab:
+     * the number of titles that have triggered issue #'s
      */
-    private int getNumFlaggedWithIssueNumbers(){
+    private int getNumFlaggedWithIssueNumbers() {
         int numTitlesWithIssueNumbers = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("""
-                SELECT COUNT(*) AS TRIGGERED_ISSUE_COUNT FROM (
-                    SELECT DISTINCT TITLEID FROM (
-                                                     SELECT TITLES.TITLEID, ORDERS.ISSUE
-                                                     FROM TITLES
-                                                              INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
-                                                     WHERE TITLES.FLAGGED = true AND ISSUE = ISSUE_FLAGGED
-                                                 ) AS FLAGGED_ORDERS
-                    ) AS ISSUE_NOT_NULL_TITLES
-            """);
+            ResultSet results = s.executeQuery(
+                    """
+                                SELECT COUNT(*) AS TRIGGERED_ISSUE_COUNT FROM (
+                                    SELECT DISTINCT TITLEID FROM (
+                                                                     SELECT TITLES.TITLEID, ORDERS.ISSUE
+                                                                     FROM TITLES
+                                                                              INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
+                                                                     WHERE TITLES.FLAGGED = true AND ISSUE = ISSUE_FLAGGED
+                                                                 ) AS FLAGGED_ORDERS
+                                    ) AS ISSUE_NOT_NULL_TITLES
+                            """);
 
             results.next();
             numTitlesWithIssueNumbers = results.getInt(1);
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -785,34 +877,33 @@ public class Controller implements Initializable {
 
     /**
      * Gets the total number of issue requests in the database
+     * 
      * @return the total number of issue requests in the database
      */
     private int getNumIssueRequests() {
         int numTitlesWithIssueNumbers = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("""
-                SELECT COUNT(*) AS TRIGGERED_ISSUE_COUNT FROM (
-                    SELECT DISTINCT TITLEID FROM (
-                                                     SELECT TITLES.TITLEID, ORDERS.ISSUE
-                                                     FROM TITLES
-                                                              INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
-                                                     WHERE ISSUE IS NOT NULL
-                                                 ) AS FLAGGED_ORDERS
-                    ) AS ISSUE_NOT_NULL_TITLES
-            """);
+            ResultSet results = s.executeQuery(
+                    """
+                                SELECT COUNT(*) AS TRIGGERED_ISSUE_COUNT FROM (
+                                    SELECT DISTINCT TITLEID FROM (
+                                                                     SELECT TITLES.TITLEID, ORDERS.ISSUE
+                                                                     FROM TITLES
+                                                                              INNER JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
+                                                                     WHERE ISSUE IS NOT NULL
+                                                                 ) AS FLAGGED_ORDERS
+                                    ) AS ISSUE_NOT_NULL_TITLES
+                            """);
 
             results.next();
             numTitlesWithIssueNumbers = results.getInt(1);
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -822,6 +913,7 @@ public class Controller implements Initializable {
 
     /**
      * Gets the number of Orders for a specified Title
+     * 
      * @param titleId The title to count orders for
      * @return The number of orders
      */
@@ -829,8 +921,7 @@ public class Controller implements Initializable {
         int ordersCount = 0;
         ResultSet result;
         Statement s = null;
-        try
-        {
+        try {
             String sql = String.format("""
                     SELECT COUNT(*) FROM ORDERS
                     WHERE titleID = %s
@@ -838,14 +929,12 @@ public class Controller implements Initializable {
 
             s = conn.createStatement();
             result = s.executeQuery(sql);
-            while(result.next()) {
+            while (result.next()) {
                 ordersCount = result.getInt(1);
             }
             result.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -854,26 +943,25 @@ public class Controller implements Initializable {
     }
 
     /**
-     * helper method to get the first piece of summary info on "new week pulls" tab: the total # of flagged titles
+     * helper method to get the first piece of summary info on "new week pulls" tab:
+     * the total # of flagged titles
      */
     private int getNumTitlesCurrentlyFlagged() {
 
         int numTitlesCurrentlyFlagged = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("SELECT COUNT(TITLES.FLAGGED) AS FlagCount FROM TITLES WHERE FLAGGED=TRUE");
+            ResultSet results = s
+                    .executeQuery("SELECT COUNT(TITLES.FLAGGED) AS FlagCount FROM TITLES WHERE FLAGGED=TRUE");
 
             results.next();
             numTitlesCurrentlyFlagged = results.getInt("FlagCount");
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -882,34 +970,32 @@ public class Controller implements Initializable {
     }
 
     /**
-     * helper method to get the fourth piece of summary info on "new week pulls" tab: the number of titles with no customer requests
+     * helper method to get the fourth piece of summary info on "new week pulls"
+     * tab: the number of titles with no customer requests
      */
     private int getNumTitlesFlaggedNoRequests() {
         int numTitlesWithNoRequests = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("""
-                        SELECT COUNT(*) FROM (
-                                SELECT DISTINCT T.TITLEID
-                                FROM ORDERS
-                                LEFT JOIN TITLES T on ORDERS.TITLEID = T.TITLEID
-                                WHERE FLAGGED = TRUE
-                        ) AS FLAGGED_WITH_REQUESTS
-                        RIGHT JOIN TITLES ON TITLES.TITLEID = FLAGGED_WITH_REQUESTS.TITLEID
-                        WHERE FLAGGED_WITH_REQUESTS.TITLEID IS NULL AND FLAGGED = TRUE
-            """);
+                                SELECT COUNT(*) FROM (
+                                        SELECT DISTINCT T.TITLEID
+                                        FROM ORDERS
+                                        LEFT JOIN TITLES T on ORDERS.TITLEID = T.TITLEID
+                                        WHERE FLAGGED = TRUE
+                                ) AS FLAGGED_WITH_REQUESTS
+                                RIGHT JOIN TITLES ON TITLES.TITLEID = FLAGGED_WITH_REQUESTS.TITLEID
+                                WHERE FLAGGED_WITH_REQUESTS.TITLEID IS NULL AND FLAGGED = TRUE
+                    """);
 
             results.next();
             numTitlesWithNoRequests = results.getInt(1);
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -918,32 +1004,30 @@ public class Controller implements Initializable {
     }
 
     /**
-     * helper method to get the piece of summary info on "monthly breakdown" tab: the number of titles with no customer requests
+     * helper method to get the piece of summary info on "monthly breakdown" tab:
+     * the number of titles with no customer requests
      */
     private int getNumTitlesNoRequests() {
         int numTitlesWithNoRequests = 0;
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("""
-                        SELECT COUNT(*) FROM (
-                                SELECT DISTINCT TITLEID
-                                FROM ORDERS
-                        ) AS TITLES_WITH_REQUESTS
-                        RIGHT JOIN TITLES ON TITLES.TITLEID = TITLES_WITH_REQUESTS.TITLEID
-                        WHERE TITLES_WITH_REQUESTS.TITLEID IS NULL
-            """);
+                                SELECT COUNT(*) FROM (
+                                        SELECT DISTINCT TITLEID
+                                        FROM ORDERS
+                                ) AS TITLES_WITH_REQUESTS
+                                RIGHT JOIN TITLES ON TITLES.TITLEID = TITLES_WITH_REQUESTS.TITLEID
+                                WHERE TITLES_WITH_REQUESTS.TITLEID IS NULL
+                    """);
 
             results.next();
             numTitlesWithNoRequests = results.getInt(1);
 
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -953,19 +1037,19 @@ public class Controller implements Initializable {
 
     /**
      * Gets a list representing all Orders in the database.
-     * If any operations adjust the database for orders, invalidateOrders() should be called.
+     * If any operations adjust the database for orders, invalidateOrders() should
+     * be called.
+     * 
      * @return An ObservableList of Order objects
      */
     public ObservableList<Order> getOrderTable() {
         ObservableList<Order> orders = FXCollections.observableArrayList();
 
-        if (storedOrders == null)
-        {
+        if (storedOrders == null) {
             invalidateOrders();
         }
 
-        for (Order o: storedOrders)
-        {
+        for (Order o : storedOrders) {
             Order copy = new Order(o.getCustomerId(), o.getTitleId(), o.getTitleName(), o.getQuantity(), o.getIssue());
             orders.add(copy);
         }
@@ -974,97 +1058,96 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Gets requests for a title and issue. Specify any number less than 1 to specify all issues
+     * Gets requests for a title and issue. Specify any number less than 1 to
+     * specify all issues
+     * 
      * @param titleId The title to get the requests for
-     * @param issue The issue to get the requests for.
+     * @param issue   The issue to get the requests for.
      * @return an ObservableList of RequestTable objects of the requested requests
      */
     public ObservableList<RequestTable> getRequests(int titleId, int issue) {
         ObservableList<RequestTable> rows = FXCollections.observableArrayList();
-    
+
         final String sql;
         if (issue > 0) {
             sql = String.format("""
-                SELECT CUSTOMERS.LASTNAME,
-                       CUSTOMERS.FIRSTNAME,
-                       ORDERS.QUANTITY,
-                       ORDERS.ISSUE
-                FROM CUSTOMERS
-                INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
-                WHERE ORDERS.TITLEID = %s
-                  AND (ORDERS.ISSUE = %s OR ORDERS.ISSUE IS NULL)
-                ORDER BY CUSTOMERS.LASTNAME
-                """, titleId, issue);
+                    SELECT CUSTOMERS.LASTNAME,
+                           CUSTOMERS.FIRSTNAME,
+                           ORDERS.QUANTITY,
+                           ORDERS.ISSUE
+                    FROM CUSTOMERS
+                    INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
+                    WHERE ORDERS.TITLEID = %s
+                      AND (ORDERS.ISSUE = %s OR ORDERS.ISSUE IS NULL)
+                    ORDER BY CUSTOMERS.LASTNAME
+                    """, titleId, issue);
         } else if (issue == -9) {
             sql = String.format("""
-                SELECT CUSTOMERS.LASTNAME,
-                       CUSTOMERS.FIRSTNAME,
-                       ORDERS.QUANTITY,
-                       ORDERS.ISSUE
-                FROM CUSTOMERS
-                INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
-                WHERE ORDERS.TITLEID = %s
-                ORDER BY CUSTOMERS.LASTNAME
-                """, titleId);
+                    SELECT CUSTOMERS.LASTNAME,
+                           CUSTOMERS.FIRSTNAME,
+                           ORDERS.QUANTITY,
+                           ORDERS.ISSUE
+                    FROM CUSTOMERS
+                    INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
+                    WHERE ORDERS.TITLEID = %s
+                    ORDER BY CUSTOMERS.LASTNAME
+                    """, titleId);
         } else {
             sql = String.format("""
-                SELECT CUSTOMERS.LASTNAME,
-                       CUSTOMERS.FIRSTNAME,
-                       ORDERS.QUANTITY,
-                       ORDERS.ISSUE
-                FROM CUSTOMERS
-                INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
-                WHERE ORDERS.TITLEID = %s
-                  AND ORDERS.ISSUE IS NULL
-                ORDER BY CUSTOMERS.LASTNAME
-                """, titleId);
+                    SELECT CUSTOMERS.LASTNAME,
+                           CUSTOMERS.FIRSTNAME,
+                           ORDERS.QUANTITY,
+                           ORDERS.ISSUE
+                    FROM CUSTOMERS
+                    INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
+                    WHERE ORDERS.TITLEID = %s
+                      AND ORDERS.ISSUE IS NULL
+                    ORDER BY CUSTOMERS.LASTNAME
+                    """, titleId);
         }
-    
+
         try (Statement s = conn.createStatement();
-             ResultSet results = s.executeQuery(sql)) {
-    
-            while(results.next())
-            {
-                String lastName  = results.getString("LASTNAME");
+                ResultSet results = s.executeQuery(sql)) {
+
+            while (results.next()) {
+                String lastName = results.getString("LASTNAME");
                 String firstName = results.getString("FIRSTNAME");
                 int quantity = results.getInt("QUANTITY");
                 Integer issueNum = (Integer) results.getObject("ISSUE"); // may be null
-    
+
                 rows.add(new RequestTable(
                         0,
                         lastName,
                         firstName,
                         quantity,
-                        issueNum == null ? 0 : issueNum
-                ));
+                        issueNum == null ? 0 : issueNum));
             }
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
-    
+
         return rows;
     }
-    
+
     /**
      * Gets a list representing all Titles in the database.
-     * If any operations adjust the database for titles, invalidateOrders() should be called.
+     * If any operations adjust the database for titles, invalidateOrders() should
+     * be called.
+     * 
      * @return An ObeservableList of all Title objects
      */
     public ObservableList<Title> getTitles() {
 
         ObservableList<Title> titles = FXCollections.observableArrayList();
 
-        if (storedTitles == null)
-        {
+        if (storedTitles == null) {
             invalidateTitles();
         }
 
-        for (Title t: storedTitles)
-        {
-            Title copy = new Title(t.getId(), t.getTitle(), t.getPrice(), t.getNotes(), t.getProductId(), t.getDateCreated(), t.isFlagged(), t.getDateFlagged(), t.getIssueFlagged());
+        for (Title t : storedTitles) {
+            Title copy = new Title(t.getId(), t.getTitle(), t.getPrice(), t.getNotes(), t.getProductId(),
+                    t.getDateCreated(), t.isFlagged(), t.getDateFlagged(), t.getIssueFlagged());
             copy.setNoRequest(t.getNoRequest());
 
             copy.flaggedProperty().addListener((obs, wasFlagged, isFlagged) -> {
@@ -1080,7 +1163,8 @@ public class Controller implements Initializable {
                             int titleId = results.getInt("TITLEID");
                             if (copy.getId() == titleId) {
                                 TextInputDialog dialog = new TextInputDialog();
-                                dialog.setContentText("This title has at least one issue # request.\nPlease enter the issue # for the new release.");
+                                dialog.setContentText(
+                                        "This title has at least one issue # request.\nPlease enter the issue # for the new release.");
                                 dialog.setTitle("Confirm Issue");
                                 dialog.setHeaderText("");
                                 final Button buttonOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
@@ -1089,7 +1173,8 @@ public class Controller implements Initializable {
                                         copy.setIssueFlagged(Integer.parseInt(dialog.getEditor().getText()));
                                     } catch (NumberFormatException e) {
                                         event.consume();
-                                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Please enter a valid integer", ButtonType.OK);
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                                                "Please enter a valid integer", ButtonType.OK);
                                         alert.show();
                                     }
                                 });
@@ -1121,6 +1206,7 @@ public class Controller implements Initializable {
 
     /**
      * Gets the total quantity from all orders for a specified Title
+     * 
      * @param titleId The title to get quantity
      * @return The sum of all request quantities
      */
@@ -1128,8 +1214,7 @@ public class Controller implements Initializable {
         int quantity = 0;
         ResultSet result;
         Statement s = null;
-        try
-        {
+        try {
             String sql = String.format("""
                     SELECT SUM(QUANTITY) FROM ORDERS
                     WHERE titleID = %s
@@ -1137,14 +1222,12 @@ public class Controller implements Initializable {
 
             s = conn.createStatement();
             result = s.executeQuery(sql);
-            while(result.next()) {
+            while (result.next()) {
                 quantity = result.getInt(1);
             }
             result.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -1152,51 +1235,55 @@ public class Controller implements Initializable {
         return quantity;
     }
 
-    //#endregion
+    // #endregion
 
-/*######################################################################/
-///////////////////////////// Initialization ////////////////////////////
-/######################################################################*/
+    /*
+     * ######################################################################/
+     * ///////////////////////////// Initialization ////////////////////////////
+     * /######################################################################
+     */
 
-    //#region Initalization
+    // #region Initalization
 
     /**
-     * Initiializes the state of the application. Creates a connection to the database,
+     * Initiializes the state of the application. Creates a connection to the
+     * database,
      * loads all Customer, Title, and Order data, populates all tables, and creates
      * listeners.
+     * 
      * @param location
      * @param resources
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-    
+
         titleTitleText.setOnMouseEntered(ev -> {
             titleTitleText.setMaxHeight(Double.MAX_VALUE);
         });
         titleTitleText.setOnMouseExited(ev -> {
             titleTitleText.setMaxHeight(Region.USE_COMPUTED_SIZE);
         });
-        
+
         // create settings object
         settings = new Settings();
-    
+
         createConnection();
-    
+
         // alter tables
         alterTables();
-            
+
         invalidateTitles();
-    
+
         filteredTitles = new FilteredList<>(getStoredTitlesSafe(), t -> true);
-        sortedTitles   = new SortedList<>(filteredTitles);
+        sortedTitles = new SortedList<>(filteredTitles);
         sortedTitles.comparatorProperty().bind(titleTable.comparatorProperty());
         titleTable.setItems(sortedTitles);
         titleTable.getSortOrder().add(titleTitleColumn);
-    
+
         // Monthly Breakdown: show all titles unfiltered.
         monthlyBreakdownTable.setItems(getStoredTitlesSafe());
-    
-        //Populate columns for Customer Table
+
+        // Populate columns for Customer Table
         customerLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         customerFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         customerPhoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
@@ -1204,11 +1291,11 @@ public class Controller implements Initializable {
         customerNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
         customerTable.getItems().setAll(this.getCustomers());
         customerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    
+
         // Make Customer Order Table Multi-Selectable
         customerOrderTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    
-        //Populate columns for Orders Table
+
+        // Populate columns for Orders Table
         customerOrderReqItemsColumn.setCellValueFactory(new PropertyValueFactory<>("TitleName"));
         customerOrderQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         customerOrderIssueColumn.setCellValueFactory(cell -> {
@@ -1218,23 +1305,25 @@ public class Controller implements Initializable {
                 return new SimpleStringProperty("");
             }
         });
-    
+
         // Comparator to sort by price, set to columns that contain price information
         Comparator<String> priceComparator = new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
                 // avoid empty string exceptions, sort first
-                if (o1.isEmpty()) return -1;
-                if (o2.isEmpty()) return 1;
+                if (o1.isEmpty())
+                    return -1;
+                if (o2.isEmpty())
+                    return 1;
                 // empty strings avoided, compare doubles
                 return Double.valueOf(o1).compareTo(Double.valueOf(o2));
             }
         };
-    
+
         titlePriceColumn.setComparator(Comparator.nullsFirst(priceComparator));
         flaggedPriceColumn.setComparator(Comparator.nullsFirst(priceComparator));
-    
-        //Populate columns for Title Table, sort by title column
+
+        // Populate columns for Title Table, sort by title column
         titleFlaggedColumn.setCellValueFactory(c -> c.getValue().flaggedProperty());
         titleFlaggedColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
         titleTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -1249,18 +1338,26 @@ public class Controller implements Initializable {
         titleDateCreatedColumn.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
         titleLastFlaggedColumn.setCellValueFactory(cell -> {
             LocalDate flaggedDate = cell.getValue().getDateFlagged();
+            LocalDate createdDate = cell.getValue().getDateCreated();
             if (flaggedDate != null) {
                 return new SimpleStringProperty(flaggedDate.toString());
-            } else {
-                return new SimpleStringProperty("Never");
             }
+
+            if (createdDate != null) {
+                LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
+
+                if (createdDate.isAfter(sixMonthsAgo)) {
+                    return new SimpleStringProperty("PENDING");
+                }
+            }
+            return new SimpleStringProperty("Never");
         });
         titleNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
         titleTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         titleTable.setRowFactory(title -> new TableRow<Title>() {
             @Override
             public void updateItem(Title t, boolean noRequests) {
-                //int numRequests = t == null ? 100 : getNumberRequests(t.getId());
+                // int numRequests = t == null ? 100 : getNumberRequests(t.getId());
                 super.updateItem(t, noRequests);
                 if (t == null || !t.getNoRequest()) {
                     setStyle("");
@@ -1269,8 +1366,8 @@ public class Controller implements Initializable {
                 }
             }
         });
-    
-        //Populate columns for flagged titles table in New Week Pulls Tab
+
+        // Populate columns for flagged titles table in New Week Pulls Tab
         flaggedTitleColumn.setCellValueFactory(new PropertyValueFactory<>("flaggedTitleName"));
         flaggedIssueColumn.setCellValueFactory(cell -> {
             if (cell.getValue().getFlaggedIssueNumber() > 0) {
@@ -1288,14 +1385,15 @@ public class Controller implements Initializable {
         });
         flaggedQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("flaggedQuantity"));
         flaggedNumRequestsColumn.setCellValueFactory(new PropertyValueFactory<>("flaggedNumRequests"));
-    
-        //for requests table, sort by title
+
+        // for requests table, sort by title
         requestLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("RequestLastName"));
         requestFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("RequestFirstName"));
         requestQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("RequestQuantity"));
-    
+
         breakdownTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        breakdownQuantityColumn.setCellValueFactory(cell -> new SimpleStringProperty(Integer.toString(getTitleQuantity(cell.getValue().getId()))));
+        breakdownQuantityColumn.setCellValueFactory(
+                cell -> new SimpleStringProperty(Integer.toString(getTitleQuantity(cell.getValue().getId()))));
         breakdownPendingIssueColumn.setCellValueFactory(cell -> {
             if (hasPendingIssueRequest(cell.getValue().getId())) {
                 return new SimpleStringProperty("Y");
@@ -1313,99 +1411,90 @@ public class Controller implements Initializable {
             return new SimpleStringProperty("Y");
         });
         monthlyBreakdownTable.getSortOrder().add(breakdownTitleColumn);
-    
-        //Title Orders table
+
+        // Title Orders table
         titleOrderLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("RequestLastName"));
         titleOrderFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("RequestFirstName"));
         titleOrderQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("RequestQuantity"));
         titleOrderIssueColumn.setCellValueFactory(new PropertyValueFactory<>("RequestIssue"));
-    
-        //Load the data for the Reports tab
 
+        // Load the data for the Reports tab
 
-        //Add Listener for selected Customer
+        // Add Listener for selected Customer
         customerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            //Bibash switch current view to customer page
+            // Bibash switch current view to customer page
             Main.clearKeyword();
             currentPage = CURRENT_PAGE.CUSTOMER;
-    
+
             TableViewSelectionModel<Customer> model = customerTable.getSelectionModel();
             ObservableList<Customer> selectedCustomers = model.getSelectedItems();
-    
-            if (selectedCustomers.size() == 1)
-            {
+
+            if (selectedCustomers.size() == 1) {
                 if (newSelection != null) {
                     customerFirstNameText.setText(newSelection.getFirstName());
                     customerLastNameText.setText(newSelection.getLastName());
                     customerPhoneText.setText(newSelection.getPhone());
                     customerEmailText.setText(newSelection.getEmail());
                     customerNotesText.setText(newSelection.getNotes());
-    
-                    if(newSelection.getDelinquent())
-                    {
+
+                    if (newSelection.getDelinquent()) {
                         delinqNoticeText.setVisible(true);
-                    }
-                    else delinqNoticeText.setVisible(false);
-    
+                    } else
+                        delinqNoticeText.setVisible(false);
+
                     newOrderButton.setDisable(false);
                     editOrderButton.setDisable(false);
                     deleteOrderButton.setDisable(false);
                     exportSingleCustomerListButton.setDisable(false);
                     editCustomerButton.setDisable(false);
-    
+
                     updateOrdersTable(newSelection);
                 }
-            }
-            else if (newSelection != null)
-            {
+            } else if (newSelection != null) {
                 customerFirstNameText.setText("Multiple Customers");
                 customerLastNameText.setText("-----");
                 customerPhoneText.setText("-----");
                 customerEmailText.setText("-----");
                 customerNotesText.setText("-----");
-    
+
                 newOrderButton.setDisable(true);
                 editOrderButton.setDisable(true);
                 deleteOrderButton.setDisable(true);
                 exportSingleCustomerListButton.setDisable(true);
                 editCustomerButton.setDisable(true);
-    
+
                 updateOrdersTable(selectedCustomers);
             }
         });
-    
-        //Add Listener for Customer Order Table
+
+        // Add Listener for Customer Order Table
         customerOrderTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             TableViewSelectionModel<Order> model = customerOrderTable.getSelectionModel();
             ObservableList<Order> selectedOrders = model.getSelectedItems();
-    
-            if (selectedOrders.size() == 1)
-            {
+
+            if (selectedOrders.size() == 1) {
                 ObservableList<Customer> selectedCustomers = customerTable.getSelectionModel().getSelectedItems();
-                
-                // Re-enable the edit order button if and only if there are not multiple customers selected
+
+                // Re-enable the edit order button if and only if there are not multiple
+                // customers selected
                 if (selectedCustomers == null || selectedCustomers.size() == 1)
                     editOrderButton.setDisable(false);
-    
-            }
-            else if (selectedOrders.size() > 0)
-            {
+
+            } else if (selectedOrders.size() > 0) {
                 editOrderButton.setDisable(true);
             }
         });
-    
-        //Add Listener for Titles table
+
+        // Add Listener for Titles table
         titleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             ObservableList<Title> selectedTitles = titleTable.getSelectionModel().getSelectedItems();
-        
-            //Bibash switch current view to TITLE page
+
+            // Bibash switch current view to TITLE page
             Main.clearKeyword();
             currentPage = CURRENT_PAGE.TITLE;
-        
-            if (newSelection != null)
-            {
-                if (selectedTitles.size() == 1)
-                {
+
+            if (newSelection != null) {
+                if (selectedTitles.size() == 1) {
                     currentFullTitle = (newSelection.getTitle() == null) ? "" : newSelection.getTitle().trim();
 
                     final int MAX_CHARS = 70;
@@ -1416,50 +1505,48 @@ public class Controller implements Initializable {
                     titleTitleText.setText(shortTitle);
 
                     titleProductIdText.setText(newSelection.getProductId());
-            
+
                     if (newSelection.getPrice() > 0) {
                         titlePriceText.setText(newSelection.getPriceDollars());
-                    }
-                    else {
+                    } else {
                         titlePriceText.setText("");
                     }
-            
+
                     if (newSelection.getDateCreated() != null) {
                         titleDateCreatedText.setText(newSelection.getDateCreated().toString());
-                    }
-                    else {
+                    } else {
                         titleDateCreatedText.setText("Unknown");
                     }
-            
+
                     titleNotesText.setText(newSelection.getNotes());
-                    String numberRequests = String.format("This Title Currently has %s Customer Requests", getNumberRequests(newSelection.getId()));
+                    String numberRequests = String.format("This Title Currently has %s Customer Requests",
+                            getNumberRequests(newSelection.getId()));
                     LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
-            
+
                     if (newSelection.getDateFlagged() != null) {
                         titleDateFlagged.setText(newSelection.getDateFlagged().toString());
-                        if (newSelection.getDateFlagged().isBefore(sixMonthsAgo) && (newSelection.getDateCreated() == null || newSelection.getDateCreated().isBefore(sixMonthsAgo))) {
+                        if (newSelection.getDateFlagged().isBefore(sixMonthsAgo)
+                                && (newSelection.getDateCreated() == null
+                                        || newSelection.getDateCreated().isBefore(sixMonthsAgo))) {
                             titleDateFlaggedNoticeText.setVisible(true);
-                        }
-                        else {
+                        } else {
                             titleDateFlaggedNoticeText.setVisible(false);
                         }
-                    }
-                    else if (newSelection.getDateCreated() != null && newSelection.getDateCreated().isAfter(sixMonthsAgo)) {
+                    } else if (newSelection.getDateCreated() != null
+                            && newSelection.getDateCreated().isAfter(sixMonthsAgo)) {
                         titleDateFlaggedNoticeText.setVisible(false);
-                    }
-                    else {
+                    } else {
                         titleDateFlagged.setText("Never");
                         titleDateFlaggedNoticeText.setVisible(true);
                     }
                     titleNumberRequestsText.setText(numberRequests);
-            
+
                     editTitleButton.setDisable(false);
 
                     titleOrderIssueColumn.setVisible(true);
-            
+
                     titleOrdersTable.getItems().setAll(this.getRequests(newSelection.getId(), -9));
-                }
-                else {
+                } else {
                     currentFullTitle = "";
                     titleTitleText.setText("Multiple Titles");
                     titleProductIdText.setText("-----");
@@ -1468,17 +1555,17 @@ public class Controller implements Initializable {
                     titleNotesText.setText("-----");
                     titleDateFlagged.setText("-----");
                     titleNumberRequestsText.setText("");
-            
+
                     boolean oldTitleFlag = false;
                     LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
-                    for (Title title: selectedTitles)
-                    {
-                        if ((title.getDateCreated() == null || title.getDateCreated().isBefore(sixMonthsAgo)) && (title.getDateFlagged() == null || title.getDateFlagged().isBefore(sixMonthsAgo))) {
+                    for (Title title : selectedTitles) {
+                        if ((title.getDateCreated() == null || title.getDateCreated().isBefore(sixMonthsAgo))
+                                && (title.getDateFlagged() == null || title.getDateFlagged().isBefore(sixMonthsAgo))) {
                             oldTitleFlag = true;
                             break;
                         }
                     }
-            
+
                     titleDateFlaggedNoticeText.setVisible(oldTitleFlag);
 
                     editTitleButton.setDisable(true);
@@ -1487,48 +1574,47 @@ public class Controller implements Initializable {
 
                     getTitleOrders(selectedTitles);
                 }
-            }
-            else {
+            } else {
                 titleTitleText.setText("");
                 titleTitleText.setWrapText(true);
                 titleTitleText.setOnMouseEntered(null);
                 titleTitleText.setOnMouseExited(null);
             }
         });
-    
-        //add listener for selected flagged title
+
+        // add listener for selected flagged title
         flaggedTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
 
-                //first the summary info for the flagged title is set
+                // first the summary info for the flagged title is set
                 if (newSelection.getFlaggedIssueNumber() > 0) {
-                    RequestTitleText.setText(newSelection.getFlaggedTitleName() + " " + newSelection.getFlaggedIssueNumber());
-                }
-                else {
+                    RequestTitleText
+                            .setText(newSelection.getFlaggedTitleName() + " " + newSelection.getFlaggedIssueNumber());
+                } else {
                     RequestTitleText.setText(newSelection.getFlaggedTitleName());
                 }
                 RequestQuantityText.setText(Integer.toString(newSelection.getFlaggedQuantity()));
                 RequestNumCustomersText.setText(Integer.toString(newSelection.getFlaggedNumRequests()));
-    
-                // System.out.println(this.getRequests(newSelection.getTitleId(), -1).size() + " : " + newSelection.getTitleId());
-                requestsTable.getItems().setAll(this.getRequests(newSelection.getTitleId(), newSelection.getFlaggedIssueNumber()));
+
+                // System.out.println(this.getRequests(newSelection.getTitleId(), -1).size() + "
+                // : " + newSelection.getTitleId());
+                requestsTable.getItems()
+                        .setAll(this.getRequests(newSelection.getTitleId(), newSelection.getFlaggedIssueNumber()));
             }
         });
-    
+
         // add listener for selecting reports tab
         tabsPane.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection.getText().equals("Reports"))
-            {
+            if (newSelection.getText().equals("Reports")) {
                 // Update New Weeks Pulls and Monthly Breakdown tabs
                 loadReportsTab();
                 getDatabaseInfo();
             }
         });
-    
+
         try {
             File myObj = new File(System.getProperty("user.home") + "/DragonSlayer/derbyDB/defaultFilePath.txt");
-            if (!myObj.createNewFile())
-            {
+            if (!myObj.createNewFile()) {
                 Scanner myReader = new Scanner(myObj);
                 if (myReader.hasNextLine()) {
                     File path = new File(myReader.nextLine());
@@ -1537,51 +1623,47 @@ public class Controller implements Initializable {
                     currentDefaultLocation.setText("The current default file location is: " + defaultFL.getPath());
                 }
                 myReader.close();
-            }
-            else
-            {
+            } else {
                 currentDefaultLocation.setText("There is not a current file path.");
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
 
     }
-    
-    //#endregion
+
+    // #endregion
 
     @FXML
     private void handleTitleClick(javafx.scene.input.MouseEvent e) {
         String full = (currentFullTitle != null && !currentFullTitle.isBlank())
                 ? currentFullTitle
                 : titleTitleText.getText();
-        if (full == null || full.isBlank()) return;
-    
+        if (full == null || full.isBlank())
+            return;
+
         Text text = new Text(full);
         text.setFont(titleTitleText.getFont());
         text.setFill(titleTitleText.getTextFill());
-    
+
         Insets pad = new Insets(16, 24, 16, 24);
         StackPane content = new StackPane(text);
         content.setPadding(pad);
         content.setStyle("-fx-background-color: transparent;");
-    
+
         text.wrappingWidthProperty().bind(
-            content.widthProperty().subtract(pad.getLeft() + pad.getRight())
-        );
-    
+                content.widthProperty().subtract(pad.getLeft() + pad.getRight()));
+
         Stage dialog = new Stage(StageStyle.DECORATED);
         dialog.setTitle("Full Title");
         dialog.initOwner(((Node) e.getSource()).getScene().getWindow());
         dialog.initModality(Modality.NONE);
         dialog.setResizable(true);
-    
+
         dialog.setScene(new Scene(content));
         dialog.setMinWidth(300);
         dialog.setMinHeight(120);
@@ -1589,17 +1671,20 @@ public class Controller implements Initializable {
         dialog.sizeToScene();
         dialog.show();
     }
-    
-/*######################################################################/
-///////////////////////////// FXML Functions ////////////////////////////
-/######################################################################*/
 
-    //#region FXML Functions
+    /*
+     * ######################################################################/
+     * ///////////////////////////// FXML Functions ////////////////////////////
+     * /######################################################################
+     */
+
+    // #region FXML Functions
 
     /**
      * Runs when the Add Customer button is pressed. Creates a new window for
      * the user to enter information and create a customer. Re-renders the
      * Customer table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
@@ -1618,9 +1703,8 @@ public class Controller implements Initializable {
             window.setHeight(280);
             window.setWidth(400);
             window.setScene(new Scene(root));
-            window.setOnHidden( e -> {
-                if (newCustomerController.customerWasAdded)
-                {
+            window.setOnHidden(e -> {
+                if (newCustomerController.customerWasAdded) {
                     invalidateCustomers();
                     customerTable.getItems().setAll(getCustomers());
                     this.loadReportsTab();
@@ -1638,6 +1722,7 @@ public class Controller implements Initializable {
      * Runs when the Add Title button is pressed. Creates a new window for
      * the user to enter information and create a title. Re-renders the
      * Title table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
@@ -1656,9 +1741,8 @@ public class Controller implements Initializable {
             window.setHeight(285);
             window.setWidth(400);
             window.setScene(new Scene(root));
-            window.setOnHidden( e -> {
-                if (newTitleController.titleWasAdded)
-                {
+            window.setOnHidden(e -> {
+                if (newTitleController.titleWasAdded) {
                     invalidateTitles();
                     titleTable.getItems().setAll(getTitles());
                     this.loadReportsTab();
@@ -1674,8 +1758,10 @@ public class Controller implements Initializable {
 
     /**
      * Runs when the Delete Customer button is pressed. Creates a dialog for the
-     * user to confirm deletion of the selected Customer. It also deletes every order
-     * linked to the customer. Re-renders the Customer and the order tables on window close.
+     * user to confirm deletion of the selected Customer. It also deletes every
+     * order
+     * linked to the customer. Re-renders the Customer and the order tables on
+     * window close.
      *
      * @param event Event that triggered the method call.
      */
@@ -1686,30 +1772,24 @@ public class Controller implements Initializable {
 
         if (customerTable.getSelectionModel().getSelectedItems() == null) {
             AlertBox.display("Confirm Delete", "Please select a customer.");
-        }
-        else {
+        } else {
             ObservableList<Customer> selectedCustomers = customerTable.getSelectionModel().getSelectedItems();
 
             boolean confirmDelete = false;
-            if (selectedCustomers.size() == 1)
-            {
+            if (selectedCustomers.size() == 1) {
                 confirmDelete = ConfirmBox.display(
-                    "Confirm Delete",
-                    "Are you sure you would like to delete customer " + firstName + " " + lastName + "?");
-            }
-            else 
-            {
+                        "Confirm Delete",
+                        "Are you sure you would like to delete customer " + firstName + " " + lastName + "?");
+            } else {
                 confirmDelete = ConfirmBox.display(
-                    "Confirm Delete",
-                    "Are you sure you would like to delete " + selectedCustomers.size() + " customers?");
+                        "Confirm Delete",
+                        "Are you sure you would like to delete " + selectedCustomers.size() + " customers?");
             }
 
-            if (confirmDelete) 
-            {
-                for (Customer customer: selectedCustomers)
-                {
+            if (confirmDelete) {
+                for (Customer customer : selectedCustomers) {
                     int customerId = customer.getId();
-            
+
                     PreparedStatement s = null; // To prepare and execute the sql statement to delete the customer
                     String sql = "DELETE FROM Customers WHERE customerId = ?";
                     String sql2 = "DELETE FROM Orders WHERE customerId = ?";
@@ -1725,7 +1805,8 @@ public class Controller implements Initializable {
                         s.executeUpdate();
                         s.close();
 
-                        Log.LogEvent("Customer Deleted", "Deleted Customer - " + customer.getFirstName() + " " + customer.getLastName());
+                        Log.LogEvent("Customer Deleted",
+                                "Deleted Customer - " + customer.getFirstName() + " " + customer.getLastName());
 
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
@@ -1744,7 +1825,7 @@ public class Controller implements Initializable {
 
                 // titleTable.getItems().setAll(getTitles());
                 // if (customerTable.getSelectionModel().getSelectedItem() != null) {
-                //     updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
+                // updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
                 // }
 
                 this.loadReportsTab();
@@ -1756,6 +1837,7 @@ public class Controller implements Initializable {
      * Runs when the Delete Request button is pressed. Creates a dialog for the
      * user to confirm deletion of the selected Order. Re-renders the Order
      * table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
@@ -1768,23 +1850,18 @@ public class Controller implements Initializable {
             ObservableList<Order> selectedOrders = customerOrderTable.getSelectionModel().getSelectedItems();
 
             boolean confirmDelete = false;
-            if (selectedOrders.size() == 1)
-            {
+            if (selectedOrders.size() == 1) {
                 confirmDelete = ConfirmBox.display(
-                    "Confirm Delete",
-                    "Are you sure you would like to delete " + selectedOrders.get(0).getTitleName() + "?");
-            }
-            else 
-            {
+                        "Confirm Delete",
+                        "Are you sure you would like to delete " + selectedOrders.get(0).getTitleName() + "?");
+            } else {
                 confirmDelete = ConfirmBox.display(
-                    "Confirm Delete",
-                    "Are you sure you would like to delete " + selectedOrders.size() + " orders?");
+                        "Confirm Delete",
+                        "Are you sure you would like to delete " + selectedOrders.size() + " orders?");
             }
 
-            if (confirmDelete) 
-            {
-                for (Order order: selectedOrders)
-                {
+            if (confirmDelete) {
+                for (Order order : selectedOrders) {
                     int customerId = order.getCustomerId();
                     int titleId = order.getTitleId();
                     int quantity = order.getQuantity();
@@ -1807,16 +1884,18 @@ public class Controller implements Initializable {
                         s.executeUpdate();
                         s.close();
 
-                        Log.LogEvent("Deleted Order", "Deleted order - CustomerID: " + customerId + " - Title: " + order.getTitleName() + " - Quantity: " + quantity + " - Issue: " + Integer.valueOf(issue));
+                        Log.LogEvent("Deleted Order",
+                                "Deleted order - CustomerID: " + customerId + " - Title: " + order.getTitleName()
+                                        + " - Quantity: " + quantity + " - Issue: " + Integer.valueOf(issue));
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
                     }
 
                     int numRequests = getNumberRequests(order.getTitleId());
-                    if (numRequests == 0)
-                    {
-                        titleTable.getItems().stream().filter(t -> t.getId() == (order.getTitleId())).findFirst().get().setNoRequest(true);
+                    if (numRequests == 0) {
+                        titleTable.getItems().stream().filter(t -> t.getId() == (order.getTitleId())).findFirst().get()
+                                .setNoRequest(true);
                         titleTable.refresh();
                     }
                 }
@@ -1835,6 +1914,7 @@ public class Controller implements Initializable {
      * Runs when the Delete Title button is pressed. Creates a dialog for the
      * user to confirm deletion of the selected Title. It also deletes evry order
      * linked to this title. Re-renders the Title and Order table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
@@ -1843,53 +1923,49 @@ public class Controller implements Initializable {
         if (titleTable.getSelectionModel().getSelectedItems() == null) {
             AlertBox.display("Confirm Delete", "Please select a title.");
         }
-        /*else if (unsaved)
-        {
-            AlertBox.display("Flags Have Not Been Saved", "Please save or reset flags before deleting a title.");
-        }*/
+        /*
+         * else if (unsaved)
+         * {
+         * AlertBox.display("Flags Have Not Been Saved",
+         * "Please save or reset flags before deleting a title.");
+         * }
+         */
         else {
             ObservableList<Title> selectedTitles = titleTable.getSelectionModel().getSelectedItems();
 
             int req = 0;
 
-            for (Title title: selectedTitles)
-            {
+            for (Title title : selectedTitles) {
                 req += getNumberRequests(title.getId());
             }
 
             boolean confirmDelete;
             if (req > 0) {
-                if (selectedTitles.size() == 1)
-                {
+                if (selectedTitles.size() == 1) {
                     confirmDelete = ConfirmBox.display(
-                        "Confirm Delete",
-                        "Are you sure you would like to delete " + selectedTitles.get(0).getTitle() + "?\nThere are " + req + " requests for this title!");
+                            "Confirm Delete",
+                            "Are you sure you would like to delete " + selectedTitles.get(0).getTitle()
+                                    + "?\nThere are " + req + " requests for this title!");
+                } else {
+                    confirmDelete = ConfirmBox.display(
+                            "Confirm Delete",
+                            "Are you sure you would like to delete " + selectedTitles.size() + " titles?\nThere are "
+                                    + req + " requests for these titles!");
                 }
-                else 
-                {
+            } else {
+                if (selectedTitles.size() == 1) {
                     confirmDelete = ConfirmBox.display(
-                        "Confirm Delete",
-                        "Are you sure you would like to delete " + selectedTitles.size() + " titles?\nThere are " + req + " requests for these titles!");
-                }
-            }
-            else {
-                if (selectedTitles.size() == 1)
-                {
+                            "Confirm Delete",
+                            "Are you sure you would like to delete " + selectedTitles.get(0).getTitle() + "?");
+                } else {
                     confirmDelete = ConfirmBox.display(
-                        "Confirm Delete",
-                        "Are you sure you would like to delete " + selectedTitles.get(0).getTitle() + "?");
-                }
-                else 
-                {
-                    confirmDelete = ConfirmBox.display(
-                        "Confirm Delete",
-                        "Are you sure you would like to delete " + selectedTitles.size() + " titles?");
+                            "Confirm Delete",
+                            "Are you sure you would like to delete " + selectedTitles.size() + " titles?");
                 }
             }
 
             if (confirmDelete) {
-                for (Title title: selectedTitles)
-                {
+                for (Title title : selectedTitles) {
                     int titleId = title.getId();
 
                     PreparedStatement s = null;
@@ -1907,7 +1983,8 @@ public class Controller implements Initializable {
                         s.executeUpdate();
                         s.close();
 
-                        Log.LogEvent("Deleted Title", "Deleted Title - Title: " + title.getTitle() + " - TitleID: " + titleId);
+                        Log.LogEvent("Deleted Title",
+                                "Deleted Title - Title: " + title.getTitle() + " - TitleID: " + titleId);
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
@@ -1921,7 +1998,7 @@ public class Controller implements Initializable {
                 titleNotesText.setText("");
 
                 // if (customerTable.getSelectionModel().getSelectedItem() != null) {
-                //     updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
+                // updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
                 // }
 
                 titleOrdersTable.getItems().clear();
@@ -1935,14 +2012,14 @@ public class Controller implements Initializable {
      * Runs when the Edit Customer button is pressed. Creates a new window for
      * the user to enter information and edit a Customer. Re-renders the
      * Customer table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
     void handleEditCustomer(ActionEvent event) {
         if (customerTable.getSelectionModel().getSelectedItem() == null) {
             AlertBox.display("Confirm Edit", "Please select a customer.");
-        }
-        else {
+        } else {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/EditCustomerBox.fxml"));
                 Parent root = fxmlLoader.load();
@@ -1959,8 +2036,7 @@ public class Controller implements Initializable {
                 window.setWidth(400);
                 window.setScene(new Scene(root));
                 window.setOnHidden(e -> {
-                    if (editCustomerController.customerWasEdited)
-                    {
+                    if (editCustomerController.customerWasEdited) {
                         invalidateCustomers();
                         customerTable.getItems().setAll(getCustomers());
 
@@ -1985,14 +2061,14 @@ public class Controller implements Initializable {
      * Runs when the Edit request(order) button is pressed. Creates a new window for
      * the user to enter information and edit order. Re-renders the
      * Orders table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
     void handleEditOrder(ActionEvent event) {
         if (customerOrderTable.getSelectionModel().getSelectedItem() == null) {
             AlertBox.display("Confirm Edit", "Please select an order.");
-        }
-        else {
+        } else {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/EditOrderBox.fxml"));
                 Parent root = fxmlLoader.load();
@@ -2013,8 +2089,7 @@ public class Controller implements Initializable {
 
                 window.setScene(new Scene(root));
                 window.setOnHidden(e -> {
-                    if (editOrderController.orderWasEdited)
-                    {
+                    if (editOrderController.orderWasEdited) {
                         invalidateOrders();
                         updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
                         this.loadReportsTab();
@@ -2036,6 +2111,7 @@ public class Controller implements Initializable {
      * Runs when the Edit Title button is pressed. Creates a new window for
      * the user to enter information and edit a title. Re-renders the
      * Title table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
@@ -2043,10 +2119,13 @@ public class Controller implements Initializable {
         if (titleTable.getSelectionModel().getSelectedItem() == null) {
             AlertBox.display("Confirm Edit", "Please select a title.");
         }
-        /*else if (unsaved)
-        {
-            AlertBox.display("Flags Have Not Been Saved", "Please save or reset flags before editing a title.");
-        }*/
+        /*
+         * else if (unsaved)
+         * {
+         * AlertBox.display("Flags Have Not Been Saved",
+         * "Please save or reset flags before editing a title.");
+         * }
+         */
         else {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/EditTitleBox.fxml"));
@@ -2066,8 +2145,7 @@ public class Controller implements Initializable {
 
                 window.setScene(new Scene(root));
                 window.setOnHidden(e -> {
-                    if (editTitleController.titleWasEdited)
-                    {
+                    if (editTitleController.titleWasEdited) {
                         invalidateTitles();
                         titleTable.getItems().setAll(getTitles());
                         titleTitleText.setText("");
@@ -2088,14 +2166,14 @@ public class Controller implements Initializable {
      * Runs when the Add Request button is pressed. Creates a new window for
      * the user to enter information and create an Order. Re-renders the
      * Orders table on window close.
+     * 
      * @param event Event that triggered the method call.
      */
     @FXML
     void handleNewOrder(ActionEvent event) {
         if (customerTable.getSelectionModel().getSelectedItem() == null) {
             AlertBox.display("New Order", "Please select a customer.");
-        }
-        else {
+        } else {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AddOrderBox.fxml"));
                 Parent root = fxmlLoader.load();
@@ -2114,15 +2192,14 @@ public class Controller implements Initializable {
                 window.setHeight(250);
                 window.setWidth(400);
                 window.setScene(new Scene(root));
-                window.setOnHidden(e ->  {
-                    if (newOrderController.orderWasAdded)
-                    {
+                window.setOnHidden(e -> {
+                    if (newOrderController.orderWasAdded) {
                         invalidateOrders();
                         updateOrdersTable(customerTable.getSelectionModel().getSelectedItem());
                         this.loadReportsTab();
-                        Title t = titleTable.getItems().stream().filter(tl -> tl.getId() == newOrderController.lastTitleAdded).findFirst().get();
-                        if (t.getNoRequest())
-                        {
+                        Title t = titleTable.getItems().stream()
+                                .filter(tl -> tl.getId() == newOrderController.lastTitleAdded).findFirst().get();
+                        if (t.getNoRequest()) {
                             t.setNoRequest(false);
                             titleTable.refresh();
                         }
@@ -2145,52 +2222,86 @@ public class Controller implements Initializable {
     @FXML
     void assignDefaultFileLocation(ActionEvent event) {
         String pathString = DefaultFileLocation.getText();
-        File temp = new File (pathString);
+        File temp = new File(pathString);
         if (temp.exists() && temp != null) {
             actiontarget.setText("");
             defaultFL = temp;
             currentDefaultLocation.setText("The current default file location is: " + defaultFL.getPath());
             try {
                 File saver = new File(System.getProperty("user.home") + "/DragonSlayer/derbyDB/defaultFilePath.txt");
-                if(saver.createNewFile())
-                {
+                if (saver.createNewFile()) {
                     Log.LogEvent("Create Default File Location", "File created: " + saver.getName());
+                } else {
+                    Log.LogEvent("Create Default File Location", "This file exists and was overwritten!");
                 }
-                else
-                {
-                    Log.LogEvent("Create Default File Location","This file exists and was overwritten!");
-                }
-            }
-            catch (IOException e) {
-                Log.LogEvent("Create Default File Location","An error occurred.");
+            } catch (IOException e) {
+                Log.LogEvent("Create Default File Location", "An error occurred.");
                 e.printStackTrace();
             }
             try {
-                FileWriter myWriter = new FileWriter(System.getProperty("user.home") + "/DragonSlayer/derbyDB/defaultFilePath.txt");
+                FileWriter myWriter = new FileWriter(
+                        System.getProperty("user.home") + "/DragonSlayer/derbyDB/defaultFilePath.txt");
                 myWriter.write(defaultFL.getPath());
                 myWriter.close();
-            }
-            catch (IOException e) {
-                Log.LogEvent("Create Default File Location","An error occurred.");
+            } catch (IOException e) {
+                Log.LogEvent("Create Default File Location", "An error occurred.");
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             actiontarget.setText("The file path " + temp.getPath() + " does not exist!");
         }
     }
 
     /**
-     * Creates a report that organizes all customer requests by title. Writes every title with customer request
+     * Creates a pop-up that lets the user select which location the exported
+     * information relates to and
+     * returns that choice for file naming
+     * 
+     * @param event
+     */
+
+    private String showLocationChoiceDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Select Store Location");
+        alert.setHeaderText("Choose the store location for this report:");
+
+        ButtonType millard = new ButtonType("MILLARD");
+        ButtonType blondo = new ButtonType("BLONDO");
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(millard, blondo, cancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isEmpty() || result.get() == cancel) {
+            return null;
+        }
+
+        if (result.get() == millard) {
+            return "MILLARD";
+        } else {
+            return "BLONDO";
+        }
+    }
+
+    /**
+     * Creates a report that organizes all customer requests by title. Writes every
+     * title with customer request
      * information underneath to an Excel spreadsheet.
+     * 
      * @param event
      */
     @FXML
     void handleExportAllRequestsByTitle(ActionEvent event) {
         ObservableList<Title> titles = titleTable.getItems();
 
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "All Customer Requests by Title " + today + ".xlsx";
+        String fileName = "All Customer Requests by Title (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2229,13 +2340,20 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Exports all titles into a list with quantities and number of requests in an Excel spreadsheet
+     * Exports all titles into a list with quantities and number of requests in an
+     * Excel spreadsheet
+     * 
      * @param event the event that triggered this method call
      */
     @FXML
     void handleExportAllTitles(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "All Titles " + today + ".xlsx";
+        String fileName = "All Titles (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2257,14 +2375,14 @@ public class Controller implements Initializable {
             org.apache.poi.ss.usermodel.Cell headerCell = header.createCell(0);
             headerCell.setCellValue("Date: " + today);
             header = sheet.createRow(1);
-            sheet.addMergedRegion(new CellRangeAddress(1,1,0,3));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 3));
             headerCell = header.createCell(0);
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("All Titles");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,3));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 3));
             sheet.getHeader().setRight("Page &P of &N");
 
             Font bold = workbook.createFont();
@@ -2298,17 +2416,16 @@ public class Controller implements Initializable {
 
             ResultSet result;
             Statement s = null;
-            try
-            {
+            try {
                 String sql = """
-                    SELECT TITLE, ISSUE, SUM(QUANTITY) AS QUANTITY, COUNT(CUSTOMERID) AS NUM_REQUESTS FROM (
-                       SELECT TITLES.TITLEID, TITLES.TITLE, ORDERS.CUSTOMERID, ORDERS.ISSUE, ORDERS.QUANTITY
-                       from TITLES
-                                LEFT JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
-                    ) AS ORDERS
-                    GROUP BY TITLEID, TITLE, ISSUE
-                    ORDER BY TITLE, ISSUE
-                    """;
+                        SELECT TITLE, ISSUE, SUM(QUANTITY) AS QUANTITY, COUNT(CUSTOMERID) AS NUM_REQUESTS FROM (
+                           SELECT TITLES.TITLEID, TITLES.TITLE, ORDERS.CUSTOMERID, ORDERS.ISSUE, ORDERS.QUANTITY
+                           from TITLES
+                                    LEFT JOIN ORDERS ON ORDERS.TITLEID = TITLES.TITLEID
+                        ) AS ORDERS
+                        GROUP BY TITLEID, TITLE, ISSUE
+                        ORDER BY TITLE, ISSUE
+                        """;
 
                 s = conn.createStatement();
                 result = s.executeQuery(sql);
@@ -2353,11 +2470,10 @@ public class Controller implements Initializable {
                 Log.LogEvent("Export All Titles", "Exported all titles");
 
                 saveReport(file, workbook);
-            }
-            catch (SQLException sqlExcept)
-            {
+            } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully",
+                        ButtonType.OK);
                 alert.setTitle("Database Error");
                 alert.show();
             }
@@ -2366,12 +2482,18 @@ public class Controller implements Initializable {
 
     /**
      * Exports a list of all customers to an Excel spreadsheet
+     * 
      * @param event The event that triggered this method call
      */
     @FXML
     void handleExportCustomerList(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "Customer List " + today + ".xlsx";
+        String fileName = "Customer List (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2394,14 +2516,14 @@ public class Controller implements Initializable {
             org.apache.poi.ss.usermodel.Cell headerCell = header.createCell(0);
             headerCell.setCellValue("Date: " + today);
             header = sheet.createRow(1);
-            sheet.addMergedRegion(new CellRangeAddress(1,1,0,2));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
             headerCell = header.createCell(0);
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("All Customers by Last Name");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,2));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 2));
             sheet.getHeader().setRight("Page &P of &N");
 
             Font bold = workbook.createFont();
@@ -2431,17 +2553,16 @@ public class Controller implements Initializable {
 
             ResultSet result;
             Statement s = null;
-            try
-            {
+            try {
                 String sql = """
-                            SELECT * FROM CUSTOMERS
-                            ORDER BY LASTNAME
-                            """;
+                        SELECT * FROM CUSTOMERS
+                        ORDER BY LASTNAME
+                        """;
 
                 s = conn.createStatement();
                 result = s.executeQuery(sql);
                 int i = 4;
-                while(result.next()) {
+                while (result.next()) {
                     row = sheet.createRow(i);
                     cell = row.createCell(0);
                     String lastName = result.getString("LASTNAME");
@@ -2461,11 +2582,10 @@ public class Controller implements Initializable {
                 Log.LogEvent("Export All Customers", "Exporting all customers");
 
                 saveReport(file, workbook);
-            }
-            catch (SQLException sqlExcept)
-            {
+            } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully",
+                        ButtonType.OK);
                 alert.setTitle("Database Error");
                 alert.show();
             }
@@ -2473,15 +2593,21 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Creates a report to export all of the flagged titles, in the same format as the All Requests by Title report
+     * Creates a report to export all of the flagged titles, in the same format as
+     * the All Requests by Title report
      */
     @FXML
     void handleExportFlaggedTitles(ActionEvent event) {
         ObservableList<FlaggedTable> titles = getFlaggedTitles();
         ObservableList<Title> titlesTable = titleTable.getItems();
 
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "All Flagged Titles " + today + ".xlsx";
+        String fileName = "All Flagged Titles (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2526,13 +2652,20 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Exports a list of all titles with no customer requests to an Excel spreadsheet
+     * Exports a list of all titles with no customer requests to an Excel
+     * spreadsheet
+     * 
      * @param event the event that triggered this method call
      */
     @FXML
-    void handleExportNoRequestTitles(ActionEvent  event) {
+    void handleExportNoRequestTitles(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "Zero Request Titles " + today + ".xlsx";
+        String fileName = "Zero Request Titles (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2557,7 +2690,7 @@ public class Controller implements Initializable {
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("Titles with Zero Requests");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,0));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 0));
             sheet.getHeader().setRight("Page &P of &N");
 
             Font bold = workbook.createFont();
@@ -2578,7 +2711,7 @@ public class Controller implements Initializable {
             int i = 0;
             for (Title title : titles) {
                 if (getNumberRequests(title.getId()) == 0) {
-                    row = sheet.createRow(i+4);
+                    row = sheet.createRow(i + 4);
 
                     cell = row.createCell(0);
                     cell.setCellValue(title.getTitle());
@@ -2587,7 +2720,7 @@ public class Controller implements Initializable {
                     i++;
                 }
             }
-            row = sheet.createRow(i+4);
+            row = sheet.createRow(i + 4);
             cell = row.createCell(0);
             cell.setCellValue("Total: " + i);
 
@@ -2599,12 +2732,18 @@ public class Controller implements Initializable {
 
     /**
      * Exports all titles with pending issue number requests to an Excel spreadsheet
+     * 
      * @param event the event that triggered this method call
      */
     @FXML
     void handleExportPendingIssueNumbers(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "Pending Issue Requests " + today + ".xlsx";
+        String fileName = "Pending Issue Requests (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2626,14 +2765,14 @@ public class Controller implements Initializable {
             org.apache.poi.ss.usermodel.Cell headerCell = header.createCell(0);
             headerCell.setCellValue("Date: " + today);
             header = sheet.createRow(1);
-            sheet.addMergedRegion(new CellRangeAddress(1,1,0,2));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
             headerCell = header.createCell(0);
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("Pending Issue Number Requests");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,3));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 3));
             sheet.getHeader().setRight("Page &P of &N");
 
             Font bold = workbook.createFont();
@@ -2667,19 +2806,18 @@ public class Controller implements Initializable {
 
             ResultSet result;
             Statement s = null;
-            try
-            {
+            try {
                 String sql = """
-                            SELECT T.TITLE, ISSUE_REQUESTS.CUSTOMERID, ISSUE_REQUESTS.TITLEID, ISSUE_REQUESTS.QUANTITY, ISSUE_REQUESTS.ISSUE, ISSUE_REQUESTS.FIRSTNAME, ISSUE_REQUESTS.LASTNAME
-                            FROM (
-                                              SELECT O.CUSTOMERID, O.TITLEID, O.QUANTITY, O.ISSUE, C.FIRSTNAME, C.LASTNAME
-                                              FROM ORDERS O
-                                                       INNER JOIN CUSTOMERS C on O.CUSTOMERID = C.CUSTOMERID
-                                              WHERE ISSUE IS NOT NULL
-                                          ) AS ISSUE_REQUESTS
-                            INNER JOIN TITLES T on ISSUE_REQUESTS.TITLEID = T.TITLEID
-                            ORDER BY T.TITLE
-                            """;
+                        SELECT T.TITLE, ISSUE_REQUESTS.CUSTOMERID, ISSUE_REQUESTS.TITLEID, ISSUE_REQUESTS.QUANTITY, ISSUE_REQUESTS.ISSUE, ISSUE_REQUESTS.FIRSTNAME, ISSUE_REQUESTS.LASTNAME
+                        FROM (
+                                          SELECT O.CUSTOMERID, O.TITLEID, O.QUANTITY, O.ISSUE, C.FIRSTNAME, C.LASTNAME
+                                          FROM ORDERS O
+                                                   INNER JOIN CUSTOMERS C on O.CUSTOMERID = C.CUSTOMERID
+                                          WHERE ISSUE IS NOT NULL
+                                      ) AS ISSUE_REQUESTS
+                        INNER JOIN TITLES T on ISSUE_REQUESTS.TITLEID = T.TITLEID
+                        ORDER BY T.TITLE
+                        """;
 
                 s = conn.createStatement();
                 result = s.executeQuery(sql);
@@ -2725,11 +2863,10 @@ public class Controller implements Initializable {
                 Log.LogEvent("Export Pending Issue Titles", "Exporting all titles with pending issue numbers");
 
                 saveReport(file, workbook);
-            }
-            catch (SQLException sqlExcept)
-            {
+            } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully",
+                        ButtonType.OK);
                 alert.setTitle("Database Error");
                 alert.show();
             }
@@ -2737,7 +2874,8 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Creates a Excel report for a single Customer. Gets all available requests for the customer and writes them
+     * Creates a Excel report for a single Customer. Gets all available requests for
+     * the customer and writes them
      * to an Excel spreadsheet.
      */
     @FXML
@@ -2750,9 +2888,13 @@ public class Controller implements Initializable {
             selectedAlert.setHeaderText("");
             selectedAlert.show();
         }
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
 
         LocalDate today = LocalDate.now();
-        String fileName = customer.getFullName() + " Requests " + today + ".xlsx";
+        String fileName = customer.getFullName() + " Requests (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2772,14 +2914,14 @@ public class Controller implements Initializable {
             org.apache.poi.ss.usermodel.Cell headerCell = header.createCell(0);
             headerCell.setCellValue("Date: " + today);
             header = sheet.createRow(1);
-            sheet.addMergedRegion(new CellRangeAddress(1,1,0,2));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
             headerCell = header.createCell(0);
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("Single Customer Request List");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,2));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 2));
             sheet.getHeader().setRight("Page &P of &N");
 
             Row row = sheet.createRow(2);
@@ -2814,22 +2956,22 @@ public class Controller implements Initializable {
             rightAlign.setAlignment(HorizontalAlignment.RIGHT);
 
             Statement s = null;
-            try
-            {
-                String sql = String.format("""
-                        SELECT ORDERS.CUSTOMERID, ORDERS.TITLEID, TITLES.title, ORDERS.QUANTITY, ORDERS.ISSUE FROM TITLES
-                        INNER JOIN ORDERS ON Orders.titleID=TITLES.TitleId
-                        WHERE ORDERS.CUSTOMERID=%s
-                        ORDER BY TITLE
-                        """, customer.getId());
+            try {
+                String sql = String.format(
+                        """
+                                SELECT ORDERS.CUSTOMERID, ORDERS.TITLEID, TITLES.title, ORDERS.QUANTITY, ORDERS.ISSUE FROM TITLES
+                                INNER JOIN ORDERS ON Orders.titleID=TITLES.TitleId
+                                WHERE ORDERS.CUSTOMERID=%s
+                                ORDER BY TITLE
+                                """,
+                        customer.getId());
 
                 s = conn.createStatement();
                 ResultSet results = s.executeQuery(sql);
 
                 int i = 4;
                 int totalQuantity = 0;
-                while(results.next())
-                {
+                while (results.next()) {
                     row = sheet.createRow(i);
                     cell = row.createCell(0);
                     cell.setCellStyle(reqItemStyle);
@@ -2858,14 +3000,14 @@ public class Controller implements Initializable {
                 cell = row.createCell(2);
                 cell.setCellValue(totalQuantity);
 
-                Log.LogEvent("Export Single Customer", "Exporting a single customer - Customer Name: " + customer.getFirstName() + " " + customer.getLastName());
+                Log.LogEvent("Export Single Customer", "Exporting a single customer - Customer Name: "
+                        + customer.getFirstName() + " " + customer.getLastName());
 
                 saveReport(file, workbook);
-            }
-            catch (SQLException sqlExcept)
-            {
+            } catch (SQLException sqlExcept) {
                 Log.LogEvent("SQL Exception", sqlExcept.getMessage());
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully",
+                        ButtonType.OK);
                 alert.setTitle("Database Error");
                 alert.show();
             }
@@ -2885,9 +3027,13 @@ public class Controller implements Initializable {
             selectedAlert.setHeaderText("");
             selectedAlert.show();
         } else {
+            String location = showLocationChoiceDialog();
+            if (location == null) {
+                return;
+            }
 
             LocalDate today = LocalDate.now();
-            String fileName = title.getTitle() + " Requests " + today + ".xlsx";
+            String fileName = title.getTitle() + " Requests (" + location + ") " + today + ".xlsx";
 
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(defaultFL);
@@ -2921,8 +3067,10 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Handler for the Export Single Title button in the reports tab. Creates a report for a single title that is
+     * Handler for the Export Single Title button in the reports tab. Creates a
+     * report for a single title that is
      * selected in the reports tab
+     * 
      * @param event the event that triggered this method call
      */
     @FXML
@@ -2934,10 +3082,16 @@ public class Controller implements Initializable {
             selectedAlert.setHeaderText("");
             selectedAlert.show();
         } else {
-            Title title = new Title(flaggedTableTitle.getTitleId(), flaggedTableTitle.getFlaggedTitleName(), flaggedTableTitle.getFlaggedPriceCents(), "", "", null);
+            Title title = new Title(flaggedTableTitle.getTitleId(), flaggedTableTitle.getFlaggedTitleName(),
+                    flaggedTableTitle.getFlaggedPriceCents(), "", "", null);
+
+            String location = showLocationChoiceDialog();
+            if (location == null) {
+                return;
+            }
 
             LocalDate today = LocalDate.now();
-            String fileName = title.getTitle() + " Requests " + today + ".xlsx";
+            String fileName = title.getTitle() + " Requests (" + location + ") " + today + ".xlsx";
 
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(defaultFL);
@@ -2971,13 +3125,20 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Exports a list of all titles that have not been flagged in at least 6 months to an Excel spreadsheet
+     * Exports a list of all titles that have not been flagged in at least 6 months
+     * to an Excel spreadsheet
+     * 
      * @param event the event that triggered this method call
      */
     @FXML
     void handleExportStalledTitles(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String fileName = "Stalled Titles " + today + ".xlsx";
+        String fileName = "Stalled Titles (" + location + ") " + today + ".xlsx";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
@@ -2997,14 +3158,14 @@ public class Controller implements Initializable {
             org.apache.poi.ss.usermodel.Cell headerCell = header.createCell(0);
             headerCell.setCellValue("Date: " + today);
             header = sheet.createRow(1);
-            sheet.addMergedRegion(new CellRangeAddress(1,1,0,1));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
             headerCell = header.createCell(0);
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             headerCell.setCellStyle(cellStyle);
             headerCell.setCellValue("All Stalled Titles");
 
-            sheet.setRepeatingRows(new CellRangeAddress(3,3,0,1));
+            sheet.setRepeatingRows(new CellRangeAddress(3, 3, 0, 1));
             sheet.getHeader().setRight("Page &P of &N");
 
             Font bold = workbook.createFont();
@@ -3029,8 +3190,9 @@ public class Controller implements Initializable {
             LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
             int i = 4;
             for (Title title : titles) {
-                if ((title.getDateFlagged() == null || title.getDateFlagged().isBefore(sixMonthsAgo)) && !(title.getDateCreated() !=null
-                        && title.getDateCreated().isAfter(sixMonthsAgo))) {
+                if ((title.getDateFlagged() == null || title.getDateFlagged().isBefore(sixMonthsAgo))
+                        && !(title.getDateCreated() != null
+                                && title.getDateCreated().isAfter(sixMonthsAgo))) {
                     row = sheet.createRow(i);
 
                     cell = row.createCell(0);
@@ -3057,8 +3219,13 @@ public class Controller implements Initializable {
 
     @FXML
     void handleExportBackup(ActionEvent event) {
+        String location = showLocationChoiceDialog();
+        if (location == null) {
+            return;
+        }
+
         LocalDate today = LocalDate.now();
-        String zipName = "DerbyDB_" + today + ".zip";
+        String zipName = "DerbyDB_" + location + "_" + today + ".zip";
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(defaultFL);
         fileChooser.setTitle("Export Location");
@@ -3068,7 +3235,6 @@ public class Controller implements Initializable {
         ZipUtil.pack(new File(folderPath), file);
     }
 
-  
     /**
      * Sets the Flagged attribute of all Titles to false
      */
@@ -3081,9 +3247,9 @@ public class Controller implements Initializable {
                 .ifPresent(response -> {
                     PreparedStatement s = null;
                     String sql = """
-                                UPDATE Titles
-                                SET FLAGGED = FALSE, ISSUE_FLAGGED = NULL
-                                """;
+                            UPDATE Titles
+                            SET FLAGGED = FALSE, ISSUE_FLAGGED = NULL
+                            """;
                     try {
                         s = conn.prepareStatement(sql);
                         s.executeUpdate();
@@ -3092,7 +3258,7 @@ public class Controller implements Initializable {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
                     }
-                    //titleTable.getItems().setAll(getTitles()); <- Original code
+                    // titleTable.getItems().setAll(getTitles()); <- Original code
                     invalidateTitles();
                     titleTable.setItems(getTitles());
                     titleTable.refresh();
@@ -3104,17 +3270,16 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void saveThisFlag(Title title)
-    {
+    void saveThisFlag(Title title) {
         ZonedDateTime startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         long todayMillis = startOfToday.toEpochSecond() * 1000;
         Date today = new Date(todayMillis);
         PreparedStatement s = null;
         String sql = """
-            UPDATE Titles
-            SET FLAGGED = TRUE, DATE_FLAGGED = ?, ISSUE_FLAGGED = ?
-            WHERE TITLEID = ?
-            """;
+                UPDATE Titles
+                SET FLAGGED = TRUE, DATE_FLAGGED = ?, ISSUE_FLAGGED = ?
+                WHERE TITLEID = ?
+                """;
         try {
             s = conn.prepareStatement(sql);
             s.setString(1, DateFormat.getDateInstance().format(today));
@@ -3133,18 +3298,17 @@ public class Controller implements Initializable {
         invalidateTitles();
         this.loadReportsTab();
         getDatabaseInfo();
-        Log.LogEvent("Save Flag",title.getTitle() + " has been flagged and saved!");
+        Log.LogEvent("Save Flag", title.getTitle() + " has been flagged and saved!");
     }
 
     @FXML
-    void unsaveThisFlag(Title title)
-    {
+    void unsaveThisFlag(Title title) {
         PreparedStatement s = null;
         String sql = """
-                    UPDATE Titles
-                    SET FLAGGED = FALSE, ISSUE_FLAGGED = NULL
-                    WHERE TITLEID = ?
-                    """;
+                UPDATE Titles
+                SET FLAGGED = FALSE, ISSUE_FLAGGED = NULL
+                WHERE TITLEID = ?
+                """;
         try {
             s = conn.prepareStatement(sql);
             s.setString(1, Integer.toString(title.getId()));
@@ -3161,12 +3325,11 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void handleCustomerKeyboardInput(KeyEvent event)
-    {
-        // System.out.println("Customer keyboard input triggered: " + event.getCode().toString());
+    void handleCustomerKeyboardInput(KeyEvent event) {
+        // System.out.println("Customer keyboard input triggered: " +
+        // event.getCode().toString());
 
-        if (event.isControlDown() && event.getCode() == KeyCode.F)
-        {
+        if (event.isControlDown() && event.getCode() == KeyCode.F) {
             Scene scene = customerOrderTable.getScene();
 
             TextField search = (TextField) scene.lookup("#CustomerSearch");
@@ -3177,46 +3340,37 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void passCustomerKeyboardFocus(MouseEvent event)
-    {
-        if (event.getEventType() == MouseEvent.MOUSE_CLICKED)
-        {
+    void passCustomerKeyboardFocus(MouseEvent event) {
+        if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
             customerOrderTable.getScene().lookup("#CustomerAnchorPane").requestFocus();
         }
     }
 
     @FXML
-    void handleTitleKeyboardInput(KeyEvent event)
-    {
-        if (event.isControlDown() && event.getCode() == KeyCode.F)
-        {
+    void handleTitleKeyboardInput(KeyEvent event) {
+        if (event.isControlDown() && event.getCode() == KeyCode.F) {
             Scene scene = titleTable.getScene();
 
             TextField search = (TextField) scene.lookup("#TitleSearch");
             search.requestFocus();
         }
 
-        if (event.isControlDown() && event.getCode() == KeyCode.M)
-        {
-            for (Title title : titleTable.getSelectionModel().getSelectedItems())
-            {
+        if (event.isControlDown() && event.getCode() == KeyCode.M) {
+            for (Title title : titleTable.getSelectionModel().getSelectedItems()) {
                 title.setFlagged(!title.isFlagged());
             }
         }
     }
 
     @FXML
-    public void passTitleKeyboardFocus(MouseEvent event)
-    {
-        if (event.getEventType() == MouseEvent.MOUSE_CLICKED)
-        {
+    public void passTitleKeyboardFocus(MouseEvent event) {
+        if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
             titleTable.getScene().lookup("#TitleAnchorPane").requestFocus();
         }
     }
 
     @FXML
-    private void handleTitleSearchDouble(MouseEvent e)
-    {
+    private void handleTitleSearchDouble(MouseEvent e) {
         if (e.getClickCount() >= 2) {
             TextField tf = (TextField) e.getSource();
             tf.selectAll();
@@ -3226,8 +3380,7 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    public void handleTitleJumping(String keyword)
-    {
+    public void handleTitleJumping(String keyword) {
         ObservableList<Title> titles = titleTable.getItems();
         for (int i = 0; i < titles.size(); i++) {
             if (titles.get(i).getTitle().toLowerCase().startsWith(keyword)) {
@@ -3239,29 +3392,28 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    public void handleTitleSearching(KeyEvent event)
-     {
+    public void handleTitleSearching(KeyEvent event) {
         String q = "";
         if (TitleSearch != null) {
             q = TitleSearch.getText();
         } else if (event != null && event.getSource() instanceof TextField) {
             q = ((TextField) event.getSource()).getText();
         }
-    
+
         final String query = (q == null) ? "" : q.trim().toLowerCase();
-    
+
         filteredTitles.setPredicate(t -> {
-            if (query.isEmpty()) return true; // Show all when empty.
+            if (query.isEmpty())
+                return true; // Show all when empty.
             return (t.getTitle() != null && t.getTitle().toLowerCase().contains(query))
-                || (t.getProductId() != null && t.getProductId().toLowerCase().contains(query))
-                || (t.getNotes() != null && t.getNotes().toLowerCase().contains(query));
+                    || (t.getProductId() != null && t.getProductId().toLowerCase().contains(query))
+                    || (t.getNotes() != null && t.getNotes().toLowerCase().contains(query));
         });
     }
-    
+
     @FXML
     // Bibash method is called which searches through the list
-    public void handleCustomerJumping(String keyword)
-    {
+    public void handleCustomerJumping(String keyword) {
         ObservableList<Customer> customers = customerTable.getItems();
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getFullName().toLowerCase().startsWith(keyword)) {
@@ -3273,31 +3425,25 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void handleCustomerSearching(KeyEvent event)
-    {
+    void handleCustomerSearching(KeyEvent event) {
         Scene scene = customerTable.getScene();
-        String search = ((TextField)scene.lookup("#CustomerSearch")).getText().toLowerCase();
+        String search = ((TextField) scene.lookup("#CustomerSearch")).getText().toLowerCase();
 
-        if (search.equals("") || search == null)
-        {
+        if (search.equals("") || search == null) {
             customerTable.getItems().setAll(getCustomers());
         }
 
         ObservableList<Customer> customers = null;
-        if (event.getCode() == KeyCode.BACK_SPACE)
-        {
+        if (event.getCode() == KeyCode.BACK_SPACE) {
             customers = getCustomers();
-        }
-        else 
-        {
+        } else {
             customers = customerTable.getItems();
         }
 
         ObservableList<Customer> sortedCustomers = FXCollections.observableArrayList();
 
         for (Customer customer : customers) {
-            if (customer.getFullName().toLowerCase().contains(search))
-            {
+            if (customer.getFullName().toLowerCase().contains(search)) {
                 sortedCustomers.add(customer);
             }
         }
@@ -3306,10 +3452,8 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void handleMarkDelinquent()
-    {
-        if(customerTable.getSelectionModel().getSelectedItem() == null)
-        {
+    void handleMarkDelinquent() {
+        if (customerTable.getSelectionModel().getSelectedItem() == null) {
             AlertBox.display("You cannot mark the void delinquent.", "Please select a customer.");
         }
         boolean currentStatus = customerTable.getSelectionModel().getSelectedItem().getDelinquent();
@@ -3318,16 +3462,16 @@ public class Controller implements Initializable {
         String sql;
         if (currentStatus == false)
             sql = """
-            UPDATE Customers
-            SET DELINQUENT = TRUE
-            WHERE CUSTOMERID = ?
-            """;
-        else 
+                    UPDATE Customers
+                    SET DELINQUENT = TRUE
+                    WHERE CUSTOMERID = ?
+                    """;
+        else
             sql = """
-            UPDATE Customers
-            SET DELINQUENT = FALSE
-            WHERE CUSTOMERID = ?
-            """;
+                    UPDATE Customers
+                    SET DELINQUENT = FALSE
+                    WHERE CUSTOMERID = ?
+                    """;
         try {
             s = conn.prepareStatement(sql);
             s.setString(1, Integer.toString(customerID));
@@ -3339,44 +3483,45 @@ public class Controller implements Initializable {
         }
 
         delinqNoticeText.setVisible(!delinqNoticeText.isVisible());
-        customerTable.getSelectionModel().getSelectedItem().setDelinquent(!customerTable.getSelectionModel().getSelectedItem().getDelinquent());
+        customerTable.getSelectionModel().getSelectedItem()
+                .setDelinquent(!customerTable.getSelectionModel().getSelectedItem().getDelinquent());
     }
 
-     /**
+    /**
      * Opens DerbyDB folder automatically
      */
     @FXML
-    void handleDerbyOpen() 
-    {
-        try 
-        {
+    void handleDerbyOpen() {
+        try {
             String dbLocation = System.getProperty("user.dir");
             File directory = new File(dbLocation);
-            
-            if (!directory.exists())
-            {
+
+            if (!directory.exists()) {
                 // attempt to open through the lastopened.txt folder
                 new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
             }
 
             new ProcessBuilder("explorer.exe", dbLocation).start();
-            
+
         } catch (FileNotFoundException e) {
-            /*TODO: Add prompt "run as admin" */
+            /* TODO: Add prompt "run as admin" */
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    //#endregion
+    // #endregion
 
-/*######################################################################/
-//////////////////////////// Custom Functions ///////////////////////////
-/######################################################################*/
-    
-    //#region Custom Functions
+    /*
+     * ######################################################################/
+     * //////////////////////////// Custom Functions ///////////////////////////
+     * /######################################################################
+     */
+
+    // #region Custom Functions
 
     /**
      * Helper method to make the extension of a file .xlsx
+     * 
      * @param file file to add the extension to
      * @return a child of the file with the new extension
      */
@@ -3405,28 +3550,30 @@ public class Controller implements Initializable {
                 String lastDBLocation = getLastDBLocation();
                 if (lastDBLocation == null) {
                     CreateDB.main(null);
-                }
-                else if (lastDBLocation.equals(settings.getSetting("dbLocation"))) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Database not in expected location. It's likely someone moved the folder manually.", ButtonType.OK);
+                } else if (lastDBLocation.equals(settings.getSetting("dbLocation"))) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Database not in expected location. It's likely someone moved the folder manually.",
+                            ButtonType.OK);
                     alert.setTitle("Database Error");
                     alert.setHeaderText("");
                     alert.show();
-                }
-                else {
+                } else {
                     moveDB();
                 }
                 try {
                     conn = DriverManager.getConnection("jdbc:derby:" + settings.getSetting("dbLocation"));
                     setLastDBLocation(settings.getSetting("dbLocation"));
                 } catch (SQLException se) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Could not create derby database. Please report this bug.", ButtonType.OK);
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Could not create derby database. Please report this bug.", ButtonType.OK);
                     alert.setTitle("Database Error");
                     alert.setHeaderText("");
                     alert.show();
                 }
             } else {
                 Log.LogEvent("SQL Exception", e.getMessage());
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Database error. This is either a bug, or you messed with the database folder.", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Database error. This is either a bug, or you messed with the database folder.", ButtonType.OK);
                 alert.setTitle("Database Error");
                 alert.setHeaderText("");
                 alert.show();
@@ -3436,6 +3583,7 @@ public class Controller implements Initializable {
 
     /**
      * retrieves the last known database location, if any
+     * 
      * @return path to last DB location if any is stored, null if no path is stored
      */
     private String getLastDBLocation() {
@@ -3452,13 +3600,15 @@ public class Controller implements Initializable {
             out = null;
             e.printStackTrace();
         } finally {
-            if (reader != null) reader.close();
+            if (reader != null)
+                reader.close();
         }
         return out;
     }
 
     /**
      * updates the last known database location
+     * 
      * @param dbPath path of the confirmed database location
      */
     private void setLastDBLocation(String dbPath) {
@@ -3490,10 +3640,12 @@ public class Controller implements Initializable {
             conn = DriverManager.getConnection("jdbc:derby:" + settings.getSetting("dbLocation"));
             conn.close();
         } catch (SQLException e) {
-            System.out.println("Error connecting to database at new location, database at old location was not deleted");
+            System.out
+                    .println("Error connecting to database at new location, database at old location was not deleted");
             return;
         }
-        // connection successful, delete database from last location and update last DB location
+        // connection successful, delete database from last location and update last DB
+        // location
         try {
             FileUtils.deleteDirectory(new File(getLastDBLocation()));
             setLastDBLocation(settings.getSetting("dbLocation"));
@@ -3503,7 +3655,8 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Creates the necessary directories and copies the database from the old location to the new location
+     * Creates the necessary directories and copies the database from the old
+     * location to the new location
      */
     private void copyDB() {
         File lastDatabaseLocation = new File(getLastDBLocation());
@@ -3517,12 +3670,14 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Helper method to get the customer requests for a single title and write them to an Excel spreadsheet. Will
+     * Helper method to get the customer requests for a single title and write them
+     * to an Excel spreadsheet. Will
      * skip all titles with no requests unless the force parameter is set to true
+     * 
      * @param workbook the Excel workbook to write to
-     * @param title the title to get information on
+     * @param title    the title to get information on
      * @param rowIndex the row of the spreadsheet to start on
-     * @param force whether to force writing all titles with no requests or not
+     * @param force    whether to force writing all titles with no requests or not
      * @return the index of the last row that was written to
      */
     private int exportSingleTitle(Workbook workbook, Title title, int rowIndex, boolean force, boolean flaggedReport) {
@@ -3618,7 +3773,8 @@ public class Controller implements Initializable {
             Log.LogEvent("Export A Single Title Report", "Exported Title: " + title.getTitle());
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception", e.getMessage());
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Database Error. Report may not have saved successfully",
+                    ButtonType.OK);
             alert.setTitle("Database Error");
             alert.show();
         }
@@ -3641,23 +3797,30 @@ public class Controller implements Initializable {
 
     /**
      * Helper method to save a report
-     * @param file The file to save
+     * 
+     * @param file     The file to save
      * @param workbook the workbook to save
      */
     private void saveReport(File file, Workbook workbook) {
-        /*Alert savingAlert = new Alert(Alert.AlertType.INFORMATION, "Saving Report", ButtonType.OK);*/
-        try (FileOutputStream outputStream = new FileOutputStream(file)){
-            /*savingAlert.setTitle("Saving");
-            savingAlert.setHeaderText("");
-            savingAlert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
-            savingAlert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
-            savingAlert.show();*/
+        /*
+         * Alert savingAlert = new Alert(Alert.AlertType.INFORMATION, "Saving Report",
+         * ButtonType.OK);
+         */
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            /*
+             * savingAlert.setTitle("Saving");
+             * savingAlert.setHeaderText("");
+             * savingAlert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+             * savingAlert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::
+             * consume);
+             * savingAlert.show();
+             */
 
             workbook.write(outputStream);
             workbook.close();
-            /*outputStream.close();*/
+            /* outputStream.close(); */
 
-            /*savingAlert.close();*/
+            /* savingAlert.close(); */
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Report saved successfully!", ButtonType.OK);
             alert.setTitle("File Saved");
             alert.setHeaderText("");
@@ -3666,8 +3829,10 @@ public class Controller implements Initializable {
             Log.LogEvent("Report Saved", "Saved a report to: " + file.getAbsolutePath());
 
         } catch (Exception e) {
-            /*savingAlert.close();*/
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Error writing to file. Report may not have saved successfully. Make sure the file is not in use by another program.", ButtonType.OK);
+            /* savingAlert.close(); */
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Error writing to file. Report may not have saved successfully. Make sure the file is not in use by another program.",
+                    ButtonType.OK);
             alert.setTitle("Save Error");
             alert.show();
             Log.LogEvent("Save Error", e.getMessage());
@@ -3676,12 +3841,13 @@ public class Controller implements Initializable {
 
     /**
      * Adds all orders for a given Customer to the Orders table.
+     * 
      * @param customer The Customer to update the Order Table for
      */
-    void updateOrdersTable(Customer customer){
+    void updateOrdersTable(Customer customer) {
         ObservableList<Order> allOrders = getOrderTable();
         ObservableList<Order> customerOrders = FXCollections.observableArrayList();
-        for(int i=0; i < allOrders.size(); i++) {
+        for (int i = 0; i < allOrders.size(); i++) {
             if (allOrders.get(i).getCustomerId() == customer.getId())
                 customerOrders.add(allOrders.get(i));
         }
@@ -3690,6 +3856,7 @@ public class Controller implements Initializable {
 
     /**
      * Adds all orders for a given set of Customers to the Orders table.
+     * 
      * @param customers The Customer to update the Order Table for
      */
     void updateOrdersTable(ObservableList<Customer> customers) {
@@ -3701,61 +3868,52 @@ public class Controller implements Initializable {
 
         // Generate a set of customer ids from those selected
         // Grab orders relating to those customer ids
-        // Condense orders for the same title but different customers into a single order object as possible
+        // Condense orders for the same title but different customers into a single
+        // order object as possible
 
-        for (Customer customer: customers)
-        {
+        for (Customer customer : customers) {
             customerIDs.add(customer.getId());
         }
 
-        for(int i=0; i < allOrders.size(); i++) {
+        for (int i = 0; i < allOrders.size(); i++) {
             if (customerIDs.contains(allOrders.get(i).getCustomerId()))
                 customerOrders.add(allOrders.get(i));
         }
 
-        for (Order order: customerOrders)
-        {
+        for (Order order : customerOrders) {
             int id = order.getTitleId();
-            if (!uniqueOrders.containsKey(id))
-            {
+            if (!uniqueOrders.containsKey(id)) {
                 ArrayList<Order> newListForTitle = new ArrayList<>();
                 newListForTitle.add(order);
 
                 uniqueOrders.put(id, newListForTitle);
-            }
-            else 
-            {
+            } else {
                 uniqueOrders.get(id).add(order);
             }
         }
 
         customerOrders.clear();
 
-        for (ArrayList<Order> titleList: uniqueOrders.values())
-        {
+        for (ArrayList<Order> titleList : uniqueOrders.values()) {
             ArrayList<Order> ordersForTitle = new ArrayList<>();
 
-            for (Order order: titleList)
-            {
-                if (ordersForTitle.size() == 0)
-                {
+            for (Order order : titleList) {
+                if (ordersForTitle.size() == 0) {
                     ordersForTitle.add(order);
-                }
-                else
-                {
+                } else {
                     boolean foundMatch = false;
-                    for (Order testUnique: ordersForTitle)
-                    {
-                        if (order.getIssue() == testUnique.getIssue())
-                        {
-                            // A existing matching order was found, increment the quantity of that order and ignroe the current order
+                    for (Order testUnique : ordersForTitle) {
+                        if (order.getIssue() == testUnique.getIssue()) {
+                            // A existing matching order was found, increment the quantity of that order and
+                            // ignroe the current order
                             testUnique.setQuantity(testUnique.getQuantity() + 1);
                             foundMatch = true;
                             break;
                         }
                     }
 
-                    // If no matching order was found, this is a order for the given title with a unique issue number
+                    // If no matching order was found, this is a order for the given title with a
+                    // unique issue number
                     if (!foundMatch)
                         ordersForTitle.add(order);
                 }
@@ -3769,53 +3927,48 @@ public class Controller implements Initializable {
 
     /**
      * Adds all orders for a given selection of titles to the Title Orders table.
+     * 
      * @param titles The title to update the Order Table for
      */
-    void getTitleOrders(ObservableList<Title> titles)
-    {
+    void getTitleOrders(ObservableList<Title> titles) {
         ArrayList<RequestTable> allRequests = new ArrayList<>();
         ObservableList<RequestTable> requestingCustomers = FXCollections.observableArrayList();
 
         Hashtable<String, ArrayList<RequestTable>> uniqueRequests = new Hashtable<>();
-        
+
         // Get all the requsts for every selected title
-        for (Title title: titles)
-        {
+        for (Title title : titles) {
             allRequests.addAll(getRequests(title.getId(), -9));
         }
 
-        // Sort the requests into the appropriate hashtable positions based on "firstName+lastName"
-        for (RequestTable table: allRequests)
-        {
+        // Sort the requests into the appropriate hashtable positions based on
+        // "firstName+lastName"
+        for (RequestTable table : allRequests) {
             String tableKey = table.getRequestFirstName() + table.getRequestLastName();
-            if (!uniqueRequests.containsKey(tableKey))
-            {
+            if (!uniqueRequests.containsKey(tableKey)) {
                 ArrayList<RequestTable> requestList = new ArrayList<>();
                 requestList.add(table);
 
                 uniqueRequests.put(tableKey, requestList);
-            }
-            else 
-            {
+            } else {
                 uniqueRequests.get(tableKey).add(table);
             }
         }
 
-        // Condense requests down to unique entries with an adjusted quantity if duplicates exist
-        for (ArrayList<RequestTable> requestList: uniqueRequests.values())
-        {
+        // Condense requests down to unique entries with an adjusted quantity if
+        // duplicates exist
+        for (ArrayList<RequestTable> requestList : uniqueRequests.values()) {
             RequestTable baseTable = null;
 
-            for (RequestTable table: requestList)
-            {
-                if (baseTable == null)
-                {
+            for (RequestTable table : requestList) {
+                if (baseTable == null) {
                     table.setRequestIssue(-1);
                     baseTable = table;
                     continue;
                 }
 
-                baseTable.setRequestQuantity(Integer.parseInt(baseTable.getRequestQuantity()) + Integer.parseInt(table.getRequestQuantity()));
+                baseTable.setRequestQuantity(Integer.parseInt(baseTable.getRequestQuantity())
+                        + Integer.parseInt(table.getRequestQuantity()));
             }
 
             requestingCustomers.add(baseTable);
@@ -3824,42 +3977,35 @@ public class Controller implements Initializable {
         titleOrdersTable.getItems().setAll(requestingCustomers);
     }
 
-    //#endregion
-
+    // #endregion
 
     /*
      * Simplification method to flag a title using a hotkey.
      */
-    public void flagKeyShortcut()
-    {
-        //titleTable.getSelectionModel().getSelectedItem().isFlagged()
-        for (Title title : titleTable.getSelectionModel().getSelectedItems())
-        {
+    public void flagKeyShortcut() {
+        // titleTable.getSelectionModel().getSelectedItem().isFlagged()
+        for (Title title : titleTable.getSelectionModel().getSelectedItems()) {
             title.setFlagged(!title.isFlagged());
         }
 
-        //titleTable.getSelectionModel().getSelectedItem().setFlagged(!titleTable.getSelectionModel().getSelectedItem().isFlagged());
-        //https://stackoverflow.com/questions/48616490/how-to-add-a-javafx-shortcut-key-combinations-for-buttons
-        //https://stackoverflow.com/questions/25397742/javafx-keyboard-event-shortcut-key
+        // titleTable.getSelectionModel().getSelectedItem().setFlagged(!titleTable.getSelectionModel().getSelectedItem().isFlagged());
+        // https://stackoverflow.com/questions/48616490/how-to-add-a-javafx-shortcut-key-combinations-for-buttons
+        // https://stackoverflow.com/questions/25397742/javafx-keyboard-event-shortcut-key
     }
 
-    private void invalidateCustomers()
-    {
-        if (storedCustomers == null)
-        {
+    private void invalidateCustomers() {
+        if (storedCustomers == null) {
             storedCustomers = FXCollections.observableArrayList();
         }
 
         storedCustomers.clear();
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("select * from Customers ORDER BY LASTNAME");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int customerId = results.getInt(1);
                 String firstName = results.getString(2);
                 String lastName = results.getString(3);
@@ -3871,32 +4017,28 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
     }
 
-    private void invalidateOrders()
-    {
-        if (storedOrders == null)
-        {
+    private void invalidateOrders() {
+        if (storedOrders == null) {
             storedOrders = FXCollections.observableArrayList();
         }
 
         storedOrders.clear();
 
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("SELECT ORDERS.CUSTOMERID, ORDERS.TITLEID, TITLES.title, ORDERS.QUANTITY, ORDERS.ISSUE FROM TITLES" +
-                    " INNER JOIN ORDERS ON Orders.titleID=TITLES.TitleId ORDER BY TITLE");
+            ResultSet results = s.executeQuery(
+                    "SELECT ORDERS.CUSTOMERID, ORDERS.TITLEID, TITLES.title, ORDERS.QUANTITY, ORDERS.ISSUE FROM TITLES"
+                            +
+                            " INNER JOIN ORDERS ON Orders.titleID=TITLES.TitleId ORDER BY TITLE");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int customerId = results.getInt(1);
                 int titleId = results.getInt(2);
                 String title = results.getString(3);
@@ -3907,68 +4049,62 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
     }
 
-    private void invalidateTitles()
-     {
-        if (storedTitles == null)
-        {
+    private void invalidateTitles() {
+        if (storedTitles == null) {
             storedTitles = FXCollections.observableArrayList();
         }
-    
-        if (conn == null)
-        {
+
+        if (conn == null) {
             storedTitles.clear();
             return;
         }
-    
-        final String sql =
-            "select TITLEID, TITLE, PRICE, NOTES, PRODUCTID, DATECREATED, " +
-            "       FLAGGED, DATE_FLAGGED, ISSUE_FLAGGED, " +
-            "       case when exists (select 1 from ORDERS where TITLES.TITLEID = ORDERS.TITLEID) " +
-            "            then 1 else 0 end as REQUESTS " +
-            "from TITLES " +
-            "order by UPPER(TITLE)";
-    
+
+        final String sql = "select TITLEID, TITLE, PRICE, NOTES, PRODUCTID, DATECREATED, " +
+                "       FLAGGED, DATE_FLAGGED, ISSUE_FLAGGED, " +
+                "       case when exists (select 1 from ORDERS where TITLES.TITLEID = ORDERS.TITLEID) " +
+                "            then 1 else 0 end as REQUESTS " +
+                "from TITLES " +
+                "order by UPPER(TITLE)";
+
         final ObservableList<Title> fresh = FXCollections.observableArrayList();
-    
+
         try (Statement s = conn.createStatement();
-             ResultSet results = s.executeQuery(sql)) {
-    
-            while(results.next())
-            {
+                ResultSet results = s.executeQuery(sql)) {
+
+            while (results.next()) {
                 int titleId = results.getInt("TITLEID");
                 String title = results.getString("TITLE");
-                int price= results.getInt("PRICE");
+                int price = results.getInt("PRICE");
                 String notes = results.getString("NOTES");
                 String productId = results.getString("PRODUCTID");
-    
+
                 Date dateCreatedNew = results.getDate("DATECREATED");
                 java.time.LocalDate dateCreated = (dateCreatedNew == null ? null : dateCreatedNew.toLocalDate());
-    
+
                 boolean flagged = results.getBoolean("FLAGGED");
                 Date dateFlaggedNew = results.getDate("DATE_FLAGGED");
                 java.time.LocalDate dateFlagged = (dateFlaggedNew == null ? null : dateFlaggedNew.toLocalDate());
                 int issueFlagged = results.getInt("ISSUE_FLAGGED");
                 boolean noRequest = results.getInt("REQUESTS") == 0;
-    
-                Title t = new Title(titleId, title, price, notes, productId, dateCreated, flagged, dateFlagged, issueFlagged);
+
+                Title t = new Title(titleId, title, price, notes, productId, dateCreated, flagged, dateFlagged,
+                        issueFlagged);
                 t.setNoRequest(noRequest);
-    
+
                 t.flaggedProperty().addListener((obs, wasFlagged, isFlagged) -> {
                     if (isFlagged) {
                         t.setDateFlagged(LocalDate.now());
                         saveThisFlag(t);
                         try (Statement s2 = conn.createStatement();
-                             ResultSet results2 = s2.executeQuery(
-                                 "SELECT 1 FROM ORDERS WHERE TITLEID = " + t.getId() +
-                                 " AND ISSUE IS NOT NULL FETCH FIRST ROW ONLY")) {
+                                ResultSet results2 = s2.executeQuery(
+                                        "SELECT 1 FROM ORDERS WHERE TITLEID = " + t.getId() +
+                                                " AND ISSUE IS NOT NULL FETCH FIRST ROW ONLY")) {
                             // if (results2.next()) {
                             // }
                         } catch (SQLException e) {
@@ -3982,50 +4118,45 @@ public class Controller implements Initializable {
                         unsaveThisFlag(t);
                     }
                 });
-    
+
                 fresh.add(t);
             }
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
             return;
         }
-    
+
         storedTitles.setAll(fresh);
     }
 
-    /*######################################################################/
-    //////////////////////////// Testing Functions ///////////////////////////
-    /######################################################################*/
+    /*
+     * ######################################################################/
+     * //////////////////////////// Testing Functions ///////////////////////////
+     * /######################################################################
+     */
     /**
      * Method to get the active customer for testing.
      */
-    public Customer getSelectedCustomer()
-    {
+    public Customer getSelectedCustomer() {
         return customerTable.getSelectionModel().getSelectedItem();
     }
 
     /**
      * Method to get the active title for testing.
      */
-    public Title getSelectedTitle()
-    {
+    public Title getSelectedTitle() {
         return titleTable.getSelectionModel().getSelectedItem();
     }
 
-    public ArrayList<Customer> getCustomerList()
-    {
+    public ArrayList<Customer> getCustomerList() {
         ArrayList<Customer> customers = new ArrayList<Customer>();
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("select * from Customers ORDER BY LASTNAME");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int customerId = results.getInt(1);
                 String firstName = results.getString(2);
                 String lastName = results.getString(3);
@@ -4037,9 +4168,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -4047,34 +4176,30 @@ public class Controller implements Initializable {
         return customers;
     }
 
-    public ArrayList<Title> getTitlesList()
-    {
+    public ArrayList<Title> getTitlesList() {
         ArrayList<Title> titles = new ArrayList<Title>();
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("select * from Titles order by UPPER(TITLE)");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int titleId = results.getInt("TITLEID");
                 String title = results.getString("TITLE");
-                int price= results.getInt("PRICE");
+                int price = results.getInt("PRICE");
                 String notes = results.getString("NOTES");
                 String productId = results.getString("PRODUCTID");
                 Date dateCreated = results.getDate("DATECREATED");
                 boolean flagged = results.getBoolean("FLAGGED");
                 Date dateFlagged = results.getDate("DATE_FLAGGED");
                 int issueFlagged = results.getInt("ISSUE_FLAGGED");
-                titles.add(new Title(titleId, title, price, notes, productId, (dateCreated == null ? null :dateCreated.toLocalDate()),
-                        flagged, (dateFlagged == null ? null :dateFlagged.toLocalDate()), issueFlagged));
+                titles.add(new Title(titleId, title, price, notes, productId,
+                        (dateCreated == null ? null : dateCreated.toLocalDate()),
+                        flagged, (dateFlagged == null ? null : dateFlagged.toLocalDate()), issueFlagged));
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -4082,34 +4207,30 @@ public class Controller implements Initializable {
         return titles;
     }
 
-    public ArrayList<Title> getFlaggedList()
-    {
+    public ArrayList<Title> getFlaggedList() {
         ArrayList<Title> titles = new ArrayList<Title>();
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet results = s.executeQuery("select * from Titles where FLAGGED=TRUE order by TITLE");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int titleId = results.getInt("TITLEID");
                 String title = results.getString("TITLE");
-                int price= results.getInt("PRICE");
+                int price = results.getInt("PRICE");
                 String notes = results.getString("NOTES");
                 String productId = results.getString("PRODUCTID");
                 Date dateCreated = results.getDate("DATECREATED");
                 boolean flagged = results.getBoolean("FLAGGED");
                 Date dateFlagged = results.getDate("DATE_FLAGGED");
                 int issueFlagged = results.getInt("ISSUE_FLAGGED");
-                titles.add(new Title(titleId, title, price, notes, productId, (dateCreated == null ? null :dateCreated.toLocalDate()),
-                        flagged, (dateFlagged == null ? null :dateFlagged.toLocalDate()), issueFlagged));
+                titles.add(new Title(titleId, title, price, notes, productId,
+                        (dateCreated == null ? null : dateCreated.toLocalDate()),
+                        flagged, (dateFlagged == null ? null : dateFlagged.toLocalDate()), issueFlagged));
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -4117,20 +4238,19 @@ public class Controller implements Initializable {
         return titles;
     }
 
-    public ArrayList<Order> getOrderListForCustomer(String lastName)
-    {
+    public ArrayList<Order> getOrderListForCustomer(String lastName) {
         ArrayList<Order> orders = new ArrayList<Order>();
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet customers = s.executeQuery("select CUSTOMERID from CUSTOMERS where LASTNAME='" + lastName + "'");
             customers.next();
             int customerId = customers.getInt("CUSTOMERID");
-            ResultSet results = s.executeQuery("SELECT * FROM ORDERS o INNER JOIN TITLES t ON o.TITLEID=t.TITLEID where CUSTOMERID=" + customerId + " order by TITLE");
+            ResultSet results = s
+                    .executeQuery("SELECT * FROM ORDERS o INNER JOIN TITLES t ON o.TITLEID=t.TITLEID where CUSTOMERID="
+                            + customerId + " order by TITLE");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 int titleId = results.getInt("TITLEID");
                 String title = results.getString("TITLE");
                 int quantity = results.getInt("QUANTITY");
@@ -4139,9 +4259,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -4149,20 +4267,19 @@ public class Controller implements Initializable {
         return orders;
     }
 
-    public ArrayList<RequestTable> getOrderListForTitle(String title)
-    {
+    public ArrayList<RequestTable> getOrderListForTitle(String title) {
         ArrayList<RequestTable> orders = new ArrayList<RequestTable>();
         Statement s = null;
-        try
-        {
+        try {
             s = conn.createStatement();
             ResultSet titles = s.executeQuery("select TITLEID from TITLES where TITLE='" + title + "'");
             titles.next();
             int titleId = titles.getInt("TITLEID");
-            ResultSet results = s.executeQuery("SELECT * FROM ORDERS o INNER JOIN CUSTOMERS c ON o.CUSTOMERID=c.CUSTOMERID where TITLEID=" + titleId + " order by LASTNAME");
+            ResultSet results = s.executeQuery(
+                    "SELECT * FROM ORDERS o INNER JOIN CUSTOMERS c ON o.CUSTOMERID=c.CUSTOMERID where TITLEID="
+                            + titleId + " order by LASTNAME");
 
-            while(results.next())
-            {
+            while (results.next()) {
                 String lastname = results.getString("LASTNAME");
                 String firstname = results.getString("FIRSTNAME");
                 int quantity = results.getInt("QUANTITY");
@@ -4171,9 +4288,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
-        }
-        catch (SQLException sqlExcept)
-        {
+        } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
@@ -4181,10 +4296,8 @@ public class Controller implements Initializable {
         return orders;
     }
 
-    public void addCustomers(ArrayList<Customer> customers) throws SQLException
-    {
-        for (Customer c : customers)
-        {
+    public void addCustomers(ArrayList<Customer> customers) throws SQLException {
+        for (Customer c : customers) {
             PreparedStatement insert = null;
             String sql = "INSERT INTO Customers (firstname, lastname, phone, email, notes) VALUES (?, ?, ?, ?, ?)";
 
@@ -4194,20 +4307,19 @@ public class Controller implements Initializable {
             insert.setString(3, c.getPhone());
             insert.setString(4, c.getEmail());
             insert.setString(5, c.getNotes());
-            //int rowsAffected =
+            // int rowsAffected =
             insert.executeUpdate();
 
             insert.close();
         }
     }
 
-    public void addTitles(ArrayList<Title> titles) throws SQLException
-    {
-        for (Title t : titles)
-        {
+    public void addTitles(ArrayList<Title> titles) throws SQLException {
+        for (Title t : titles) {
             PreparedStatement insert = null;
             String sql = "INSERT INTO Titles (TITLE, PRICE, NOTES, PRODUCTID, DATECREATED, DATE_FLAGGED) VALUES (?, ?, ?, ?, ?, ?)";
-            Date flagged = t.getDateCreated() == null ? new Date(2323223232L) : java.sql.Date.valueOf(t.getDateCreated());
+            Date flagged = t.getDateCreated() == null ? new Date(2323223232L)
+                    : java.sql.Date.valueOf(t.getDateCreated());
             insert = conn.prepareStatement(sql);
             insert.setString(1, t.getTitle());
             insert.setObject(2, t.getPrice(), Types.INTEGER);
@@ -4220,18 +4332,16 @@ public class Controller implements Initializable {
         }
     }
 
-    public void addOrders(String title, ArrayList<RequestTable> orders) throws SQLException
-    {
+    public void addOrders(String title, ArrayList<RequestTable> orders) throws SQLException {
         ArrayList<Customer> c = getCustomerList();
         ArrayList<Title> t = getTitlesList();
         ArrayList<RequestTable> ox = getOrderListForTitle(title);
-        for (RequestTable o : orders)
-        {
+        for (RequestTable o : orders) {
             PreparedStatement s = null;
             String sql = "INSERT INTO Orders (customerId, titleId, quantity, issue) VALUES (?, ?, ?, ?)";
             int titleId = t.stream().filter(tl -> tl.getTitle().equals(title)).findFirst().get().getId();
             int customerId = c.stream().filter(cs -> cs.getLastName().equals(o.getRequestLastName())
-                && cs.getFirstName().equals(o.getRequestFirstName())).findFirst().get().getId();
+                    && cs.getFirstName().equals(o.getRequestFirstName())).findFirst().get().getId();
             s = conn.prepareStatement(sql);
             s.setString(1, Integer.toString(customerId));
             s.setString(2, Integer.toString(titleId));
@@ -4249,7 +4359,7 @@ public class Controller implements Initializable {
         s.execute("DELETE FROM Customers");
         s.execute("DELETE FROM Titles");
         conn.commit();
-        s.close();;
+        s.close();
+        ;
     }
 }
-
