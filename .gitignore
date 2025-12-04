@@ -107,3 +107,6 @@ derby.log
 *.class
 lastDBconnection.txt
 settings.ini
+
+# in case the test was terminated early
+test_export_spam/
