@@ -195,6 +195,55 @@ public class Controller implements Initializable {
     }
 
     @FXML
+    private void refreshAll(ActionEvent event) {
+        try {
+            if (conn == null || conn.isClosed()) {
+                createConnection();
+            }
+
+            invalidateCustomers();
+            invalidateTitles();
+            invalidateOrders();
+
+            ObservableList<Customer> freshCustomers = FXCollections.observableArrayList(getCustomers());
+            customerTable.setItems(freshCustomers);
+
+            titleTable.refresh();
+            monthlyBreakdownTable.refresh();
+
+            TitleSearch.clear();
+            filteredTitles.setPredicate(t -> true);
+
+            ObservableList<Customer> selectedCustomers = customerTable.getSelectionModel().getSelectedItems();
+
+            if (selectedCustomers != null && !selectedCustomers.isEmpty()) {
+                if (selectedCustomers.size() == 1) {
+                    updateOrdersTable(selectedCustomers.get(0));
+                } else {
+                    updateOrdersTable(selectedCustomers);
+                }
+            } else {
+                customerOrderTable.getItems().clear();
+            }
+
+            loadReportsTab();
+            getDatabaseInfo();
+
+            customerOrderTable.refresh();
+            flaggedTable.refresh();
+            requestsTable.refresh();
+            titleOrdersTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Refresh Failed");
+            alert.setHeaderText("Could not refresh data");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
     private void handleDeleteRequest(ActionEvent e) {
         Title selectedTitle = titleTable.getSelectionModel().getSelectedItem();
         if (selectedTitle == null) {
@@ -424,6 +473,11 @@ public class Controller implements Initializable {
             new Alert(Alert.AlertType.ERROR, "Database error while adding order.", ButtonType.OK).showAndWait();
             return;
         }
+
+        invalidateCustomers();
+        invalidateOrders();
+        customerTable.getItems().setAll(getCustomers());
+        loadReportsTab();
 
         titleOrdersTable.getItems().setAll(getRequests(selectedTitle.getId(), -9));
         String numberRequests = String.format(
@@ -3294,16 +3348,25 @@ public class Controller implements Initializable {
     @FXML
     void handleDerbyOpen() 
     {
-        // Opens file explorer directly
-        try {
-            new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
+        try 
+        {
+            String dbLocation = System.getProperty("user.dir");
+            File directory = new File(dbLocation);
+            
+            if (!directory.exists())
+            {
+                // attempt to open through the lastopened.txt folder
+                new ProcessBuilder("explorer.exe", getLastDBLocation()).start();
+            }
+
+            new ProcessBuilder("explorer.exe", dbLocation).start();
+            
+        } catch (FileNotFoundException e) {
+            /*TODO: Add prompt "run as admin" */
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
     //#endregion
 
 /*######################################################################/
