@@ -24,8 +24,6 @@ public class PreviousCustomersController implements Initializable {
     @FXML ComboBox<String>  titleComboBox;           // String for title names
     @FXML ComboBox<String>  customerTitleBox;        // String for customer names
     @FXML Button            clearButton;
-    @FXML Button            removeRelationshipButton;
-    @FXML Button            reactivateRelationshipButton;
     @FXML Button            closeButton;
     
     // Uses CustomerTitleRecord, which is defined below to cut down code bloat
@@ -71,14 +69,6 @@ public class PreviousCustomersController implements Initializable {
         // Bind the table to the filtered list
         // meaning that changing filters will auto-update the table
         customerTitleTable.setItems(filteredRecords);
-
-        // Add selection listener for button state management
-        customerTitleTable.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldSelection, newSelection) -> updateButtonStates(newSelection));
-
-        // Initialize buttons as disabled until row is selected
-        removeRelationshipButton.setDisable(true);
-        reactivateRelationshipButton.setDisable(true);
     }
     
     /**
@@ -333,125 +323,9 @@ public class PreviousCustomersController implements Initializable {
     }
     
     @FXML
-    private void removeRelationship() {
-        CustomerTitleRecord selected = customerTitleTable.getSelectionModel().getSelectedItem();
-
-        // Safety check
-        if (selected == null || !selected.isActive()) {
-            return;
-        }
-
-        // Show confirmation dialog
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Remove the relationship between " + selected.getCustomerName() +
-            " and " + selected.getTitleName() + "?",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Removal");
-        confirm.setHeaderText("");
-
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                String sql = "UPDATE CustomerTitles SET DateRemoved = ? WHERE CustomerID = ? AND TitleID = ?";
-
-                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setDate(1, Date.valueOf(LocalDate.now()));
-                    pstmt.setInt(2, selected.getCustomerId());
-                    pstmt.setInt(3, selected.getTitleId());
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        Log.LogEvent("CustomerTitle Removed",
-                            "Removed relationship - Customer: " + selected.getCustomerName() +
-                            " - Title: " + selected.getTitleName());
-                        loadData();  // Refresh the table
-                        statusLabel.setText("Relationship removed");
-                        statusLabel.setStyle("-fx-text-fill: black;");
-                    }
-
-                } catch (SQLException e) {
-                    Log.LogEvent("SQL Exception - Remove CustomerTitle", e.getMessage());
-                    e.printStackTrace();
-                    statusLabel.setText("Error removing relationship");
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    AlertBox.display("Database Error", "Failed to remove relationship: " + e.getMessage());
-                }
-            }
-        });
-    }
-    
-    @FXML
-    private void reactivateRelationship() {
-        CustomerTitleRecord selected = customerTitleTable.getSelectionModel().getSelectedItem();
-
-        // Safety check
-        if (selected == null || selected.isActive()) {
-            return;
-        }
-
-        // Show confirmation dialog
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Reactivate the relationship between " + selected.getCustomerName() +
-            " and " + selected.getTitleName() + "?",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Reactivation");
-        confirm.setHeaderText("");
-
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                String sql = "UPDATE CustomerTitles SET DateRemoved = NULL WHERE CustomerID = ? AND TitleID = ?";
-
-                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, selected.getCustomerId());
-                    pstmt.setInt(2, selected.getTitleId());
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        Log.LogEvent("CustomerTitle Reactivated",
-                            "Reactivated relationship - Customer: " + selected.getCustomerName() +
-                            " - Title: " + selected.getTitleName());
-                        loadData();  // Refresh the table
-                        statusLabel.setText("Relationship reactivated");
-                        statusLabel.setStyle("-fx-text-fill: black;");
-                    }
-
-                } catch (SQLException e) {
-                    Log.LogEvent("SQL Exception - Reactivate CustomerTitle", e.getMessage());
-                    e.printStackTrace();
-                    statusLabel.setText("Error reactivating relationship");
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    AlertBox.display("Database Error", "Failed to reactivate relationship: " + e.getMessage());
-                }
-            }
-        });
-    }
-    
-    @FXML
     private void closeWindow() {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
-    }
-
-    /**
-     * Updates button states based on selected record
-     * Remove button: enabled only for ACTIVE relationships
-     * Reactivate button: enabled only for INACTIVE relationships
-     */
-    private void updateButtonStates(CustomerTitleRecord selected) {
-        if (selected == null) {
-            // No selection - disable both buttons
-            removeRelationshipButton.setDisable(true);
-            reactivateRelationshipButton.setDisable(true);
-        } else if (selected.isActive()) {
-            // Active relationship - can only remove
-            removeRelationshipButton.setDisable(false);
-            reactivateRelationshipButton.setDisable(true);
-        } else {
-            // Inactive relationship - can only reactivate
-            removeRelationshipButton.setDisable(true);
-            reactivateRelationshipButton.setDisable(false);
-        }
     }
 
     // Inner class
