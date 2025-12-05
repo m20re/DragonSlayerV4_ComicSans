@@ -438,15 +438,14 @@ public class Controller implements Initializable {
             return;
         }
 
-        // Create a dialog for Last/First/Quantity/Issue.
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Add Customer Request");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         TextField tfLast = new TextField();
         TextField tfFirst = new TextField();
-        TextField tfQty = new TextField("1"); // Default to 1.
-        TextField tfIssue = new TextField("0"); // Default to 0.
+        TextField tfQty = new TextField("1");
+        TextField tfIssue = new TextField("0");
 
         GridPane gp = new GridPane();
         gp.setHgap(8);
@@ -459,44 +458,34 @@ public class Controller implements Initializable {
 
         Button okBtn = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okBtn.addEventFilter(ActionEvent.ACTION, e -> {
-            String ln = tfLast.getText() == null ? "" : tfLast.getText().trim();
-            String fn = tfFirst.getText() == null ? "" : tfFirst.getText().trim();
-
-            int q;
-            try {
-                q = Integer.parseInt(tfQty.getText().trim());
-            } catch (Exception ex) {
-                q = -1;
-            }
-            int iss;
-            try {
-                iss = Integer.parseInt(tfIssue.getText().trim());
-            } catch (Exception ex) {
-                iss = -1;
-            }
+            String ln = tfLast.getText().trim();
+            String fn = tfFirst.getText().trim();
+            int q, iss;
 
             if (ln.isEmpty() || fn.isEmpty()) {
-                new Alert(Alert.AlertType.INFORMATION, "Please enter both last and first names.", ButtonType.OK)
-                        .showAndWait();
+                new Alert(Alert.AlertType.WARNING, "Please enter both first and last name.", ButtonType.OK).showAndWait();
                 e.consume();
                 return;
             }
+
+            try { q = Integer.parseInt(tfQty.getText().trim()); } 
+            catch (Exception ex) { q = -1; }
+            try { iss = Integer.parseInt(tfIssue.getText().trim()); } 
+            catch (Exception ex) { iss = -1; }
+
             if (q <= 0) {
-                new Alert(Alert.AlertType.INFORMATION, "Quantity must be a positive integer.", ButtonType.OK)
-                        .showAndWait();
+                new Alert(Alert.AlertType.WARNING, "Quantity must be a positive integer.", ButtonType.OK).showAndWait();
                 e.consume();
                 return;
             }
             if (iss < 0) {
-                new Alert(Alert.AlertType.INFORMATION, "Issue must be 0 or a positive integer.", ButtonType.OK)
-                        .showAndWait();
+                new Alert(Alert.AlertType.WARNING, "Issue must be 0 or a positive integer.", ButtonType.OK).showAndWait();
                 e.consume();
             }
         });
 
         Optional<ButtonType> res = dialog.showAndWait();
-        if (res.isEmpty() || res.get() != ButtonType.OK)
-            return;
+        if (res.isEmpty() || res.get() != ButtonType.OK) return;
 
         String lastName = tfLast.getText().trim().toUpperCase();
         String firstName = tfFirst.getText().trim().toUpperCase();
@@ -506,9 +495,9 @@ public class Controller implements Initializable {
 
         Integer customerId = null;
         try (PreparedStatement psFind = conn.prepareStatement(
-                "SELECT CUSTOMERID FROM CUSTOMERS WHERE UPPER(LASTNAME)=? AND UPPER(FIRSTNAME)=? ORDER BY CUSTOMERID DESC")) {
-            psFind.setString(1, lastName.toUpperCase());
-            psFind.setString(2, firstName.toUpperCase());
+                "SELECT CUSTOMERID FROM CUSTOMERS WHERE UPPER(LASTNAME)=? AND UPPER(FIRSTNAME)=?")) {
+            psFind.setString(1, lastName);
+            psFind.setString(2, firstName);
             try (ResultSet rs = psFind.executeQuery()) {
                 if (rs.next()) {
                     customerId = rs.getInt(1);
@@ -516,42 +505,27 @@ public class Controller implements Initializable {
             }
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception", e.getMessage());
-            new Alert(Alert.AlertType.ERROR, "Database error while searching for customer.", ButtonType.OK)
-                    .showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Database error while searching for customer.", ButtonType.OK).showAndWait();
             return;
         }
 
         if (customerId == null) {
-            try (PreparedStatement psIns = conn.prepareStatement(
-                    "INSERT INTO CUSTOMERS (LASTNAME, FIRSTNAME, PHONE, EMAIL, NOTES, DELINQUENT) VALUES (?, ?, NULL, NULL, NULL, FALSE)",
-                    Statement.RETURN_GENERATED_KEYS)) {
-                psIns.setString(1, lastName);
-                psIns.setString(2, firstName);
-                psIns.executeUpdate();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Customer Not Found");
+            alert.setHeaderText(null);
+            alert.setContentText("No customer found with the name:\n" +
+                    firstName + " " + lastName + "\n\n" +
+                    "Please go to the Customers tab and add this customer first.");
 
-                try (ResultSet keys = psIns.getGeneratedKeys()) {
-                    if (keys != null && keys.next()) {
-                        customerId = keys.getInt(1);
-                    }
-                }
-            } catch (SQLException e) {
-                try (PreparedStatement psFetch = conn.prepareStatement(
-                        "SELECT CUSTOMERID FROM CUSTOMERS WHERE LASTNAME=? AND FIRSTNAME=? ORDER BY CUSTOMERID DESC")) {
-                    psFetch.setString(1, lastName);
-                    psFetch.setString(2, firstName);
-                    try (ResultSet rs = psFetch.executeQuery()) {
-                        if (rs.next())
-                            customerId = rs.getInt(1);
-                    }
-                } catch (SQLException ex2) {
-                    Log.LogEvent("SQL Exception", ex2.getMessage());
-                }
-            }
-        }
+            ButtonType goToCustomers = new ButtonType("Go to Customers Tab");
+            ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(goToCustomers, cancel);
 
-        if (customerId == null) {
-            new Alert(Alert.AlertType.ERROR, "Could not resolve customer ID after insert.", ButtonType.OK)
-                    .showAndWait();
+            alert.showAndWait().ifPresent(response -> {
+                if (response == goToCustomers) {
+                    tabsPane.getSelectionModel().select(0);
+                }
+            });
             return;
         }
 
@@ -568,7 +542,7 @@ public class Controller implements Initializable {
             psOrder.executeUpdate();
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception", e.getMessage());
-            new Alert(Alert.AlertType.ERROR, "Database error while adding order.", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Failed to add request.", ButtonType.OK).showAndWait();
             return;
         }
 
