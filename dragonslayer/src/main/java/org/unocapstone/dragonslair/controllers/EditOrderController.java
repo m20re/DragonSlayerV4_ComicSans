@@ -4,7 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
@@ -12,6 +14,8 @@ import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -100,8 +104,29 @@ public class EditOrderController {
             }
             String quantity = setQuantity.getText();
             int customerId = this.customerId;
+            Statement get = null;
 
             try {
+                get = conn.createStatement();
+                ResultSet result = get.executeQuery("SELECT * FROM ORDERS");
+                while (result.next()) {
+                    Integer testTitle = result.getInt("TITLEID");
+                    Integer testCust = result.getInt("CUSTOMERID");
+                    if (testTitle == titleID && testCust == customerId)
+                    {
+                        String testIssue = result.getString("ISSUE");
+                        if ((testIssue == null && issueText == null) ||
+                            (testIssue != null && issueText != null && testIssue.equals(issueText)))
+                            {
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Cannot create duplicate Orders. If a customer has ordered multiple issues of the same title, be sure to fill out the issue field.", ButtonType.OK);
+                                alert.setTitle("Duplicate Order");
+                                alert.setHeaderText("");
+                                alert.show();
+                                return;
+                            }
+                    }
+                }
+
                 s = conn.prepareStatement(sql);
                 s.setInt(1, titleID);
                 // quantity is expected to be numeric in DB; use setInt when possible

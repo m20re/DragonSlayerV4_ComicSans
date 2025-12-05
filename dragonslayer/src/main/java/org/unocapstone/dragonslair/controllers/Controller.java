@@ -545,6 +545,9 @@ public class Controller implements Initializable {
         for (Customer c: storedCustomers)
         {
             Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(), c.getNotes(), c.getDelinquent());
+            // Determine whether this customer has any orders using the existing helper
+            int ordersForCustomer = getNumOrdersForCustomer(copy.getLastName());
+            copy.setNoRequests(ordersForCustomer == 0);
             customers.add(copy);
         }
 
@@ -1116,6 +1119,18 @@ public class Controller implements Initializable {
         customerNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
         customerTable.getItems().setAll(this.getCustomers());
         customerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        customerTable.setRowFactory(customer -> new TableRow<Customer>() {
+            @Override
+            public void updateItem(Customer c, boolean noRequests){
+                super.updateItem(c, noRequests);
+                if(c == null || !c.getNoRequests()){
+                    setStyle("");
+                }
+                else{
+                    setStyle("-fx-background-color: #f2e88a;");
+                }
+            }
+        });
     
         // Make Customer Order Table Multi-Selectable
         customerOrderTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -1244,6 +1259,7 @@ public class Controller implements Initializable {
                     customerPhoneText.setText(newSelection.getPhone());
                     customerEmailText.setText(newSelection.getEmail());
                     customerNotesText.setText(newSelection.getNotes());
+
     
                     if(newSelection.getDelinquent())
                     {
@@ -3973,6 +3989,16 @@ public class Controller implements Initializable {
         }
 
         return orders;
+    }
+
+    public int getNumOrdersForCustomer(String lastName) {
+        try {
+            ArrayList<Order> orders = getOrderListForCustomer(lastName);
+            return orders == null ? 0 : orders.size();
+        } catch (Exception ex) {
+            Log.LogEvent("Error", "Unable to get order count for customer: " + lastName + " - " + ex.getMessage());
+            return 0;
+        }
     }
 
     public ArrayList<RequestTable> getOrderListForTitle(String title)

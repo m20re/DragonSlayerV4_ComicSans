@@ -14,6 +14,7 @@ public class Customer {
     private String email;
     private String notes;
     private int id;
+    private boolean noRequests;
     private boolean delinquent;
 
     /**
@@ -157,6 +158,22 @@ public class Customer {
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * Gets the request status of customer
+     * @return boolean "noRequests"
+     */
+    public boolean getNoRequests(){
+        return noRequests;
+    }
+
+    /**
+     * Sets the request status of customer
+     * @param zeroRequests whether the customer has any requests
+     */
+    public void setNoRequests(boolean zeroRequests){
+        noRequests = zeroRequests;
     }
         
     /**
