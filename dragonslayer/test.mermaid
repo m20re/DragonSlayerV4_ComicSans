@@ -1,0 +1,102 @@
+flowchart TB
+%% =========================
+%% LAYERS / GROUPS
+%% =========================
+subgraph PROD[Production Environment]
+  subgraph OS[Operating System]
+    WIN[Windows OS]
+  end
+
+  subgraph APP_SERVER[Application Server]
+    JVM[JVM / Custom JRE\n(java.se + required JavaFX modules)]
+  end
+
+  subgraph APP_LAYER[Application Layer]
+    APP[Dragonslayer Application\nV4_ComicSans]
+  end
+
+  subgraph UI[UI Framework]
+    FXC[JavaFX Controls 21.0.8]
+    FXG[JavaFX Graphics 21.0.8]
+    FXB[JavaFX Base 21.0.8]
+    FXML[JavaFX FXML 21.0.8]
+  end
+
+  subgraph DATA[Data Processing]
+    POI[Apache POI 5.2.2\n(Excel Core)]
+    POOXX[Apache POI-OOXML 5.2.2]
+    POOXXL[Apache POI-OOXML Lite 5.2.2]
+    XMLB[XMLBeans 5.0.3]
+  end
+
+  subgraph UTILS[Utilities & Libraries]
+    CCODEC[Commons Codec 1.15]
+    CCOLL[Commons Collections4 4.4]
+    CCOMP[Commons Compress 1.21]
+    CIO[Commons IO 2.11.0]
+    CMATH[Commons Math3 3.6.1]
+    CURVE[curveapi 1.07]
+    SBITS[SparseBitSet 1.2]
+    SLF4J[SLF4J API 1.6.6]
+    LOG4J[Log4j API 2.17.2]
+  end
+
+  subgraph COMP[Compression & DB]
+    ZT[ZT-ZIP 1.16]
+    DERBY[Derby 10.15.2.0]
+    DSHARE[Derby Shared 10.15.2.0]
+  end
+end
+
+%% =========================
+%% CONNECTIONS
+%% =========================
+WIN --> JVM
+APP --> FXC
+APP --> FXG
+APP --> FXB
+APP --> FXML
+APP --> POI
+APP --> POOXX
+APP --> POOXXL
+APP --> DERBY
+APP --> ZT
+APP --> CCODEC
+APP --> CCOLL
+APP --> CCOMP
+APP --> CIO
+APP --> CMATH
+APP --> CURVE
+APP --> SBITS
+APP --> SLF4J
+APP --> LOG4J
+
+POOXX --> XMLB
+POOXXL --> XMLB
+
+DERBY --> DSHARE
+
+%% UI depends on JVM runtime
+JVM --> FXC
+JVM --> FXG
+JVM --> FXB
+JVM --> FXML
+
+%% =========================
+%% STYLES
+%% =========================
+classDef app fill:#2ecc71,stroke:#1e824c,color:#fff,font-weight:bold;
+classDef ui fill:#34495e,stroke:#2c3e50,color:#ecf0f1;
+classDef data fill:#2c3e50,stroke:#1f2d3a,color:#ecf0f1;
+classDef utils fill:#22313f,stroke:#1c2833,color:#ecf0f1;
+classDef comp fill:#3b3b98,stroke:#2b2b78,color:#ecf0f1;
+classDef jvm fill:#f39c12,stroke:#d68910,color:#fff,font-weight:bold;
+classDef os fill:#bdc3c7,stroke:#95a5a6,color:#2c3e50;
+
+class APP app
+class FXC,FXG,FXB,FXML ui
+class POI,POOXX,POOXXL,XMLB data
+class CCODEC,CCOLL,CCOMP,CIO,CMATH,CURVE,SBITS,SLF4J,LOG4J utils
+class ZT,DERBY,DSHARE comp
+class JVM jvm
+class WIN os

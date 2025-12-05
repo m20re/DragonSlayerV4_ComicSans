@@ -214,6 +214,14 @@ public class Title {
     }
 
     /**
+     * Sets the date flagged on a title
+     * @param dateFlagged 
+     */
+    public void setDateFlagged(LocalDate dateFlagged) {
+        this.dateFlagged = dateFlagged;
+    }
+
+    /**
      * Gets specific issue number that this title is flagged for
      * @return the title's flagged issue number
      */

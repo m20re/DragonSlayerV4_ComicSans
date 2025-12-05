@@ -6,7 +6,7 @@
 
     <groupId>org.unocapstone.dragonslair</groupId>
     <artifactId>dragonslayer</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.1.0-SNAPSHOT</version>
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,9 +15,9 @@
     <maven.compiler.release>21</maven.compiler.release>
     <javafx.version>21.0.8</javafx.version>
     <derby.version>10.15.2.0</derby.version>
-    <junit.version>4.13.2</junit.version>
+    <junit.version>5.10.3</junit.version>
     <cucumber.version>7.14.0</cucumber.version>
-    <surefire.version>3.2.5</surefire.version>
+    <surefire.version>3.5.2</surefire.version>
     <jlink.plugin.version>3.1.0</jlink.plugin.version>
     <jpackage.plugin.version>1.7.1</jpackage.plugin.version>
 
@@ -29,7 +29,28 @@
     <app.main.class>org.unocapstone.dragonslair.Launcher</app.main.class>
     <app.name>DragonSlayer</app.name>
     <app.vendor>UNO Capstone</app.vendor>
+
+    <!-- Make Headless (non-gui) testing the default -->
+    <!-- (Personal notes) 
+    -Dtestfx.headless=true tells TestFX to use headless mode 
+    -Dprism.order=sw forces JavaFX to use software rendering, avoiding GPU usage
+    -Dprism.text=t2k uses a text rendering engine that works the display 
+    -->
+    <test.argLine>-Dtestfx.headless=true -Dprism.order=sw -Dprism.text=t2k</test.argLine>
 </properties>
+
+<!-- Ensures all JUnit 5 files are compatible -->
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>${junit.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>    
+    </dependencies>
+</dependencyManagement>
 
 <dependencies>
     <!-- JavaFX (platform-classified) -->
@@ -61,7 +82,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!--  -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -79,15 +99,19 @@
       <version>1.16</version>
     </dependency>
 
-    <!-- JUnit -->
+    <!-- JUnit 5 -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-launcher</artifactId>
+        <scope>test</scope>
     </dependency>
 
-    <!-- Cucumber -->
+    <!-- Cucumber for JUnit 5 -->
     <dependency>
         <groupId>io.cucumber</groupId>
         <artifactId>cucumber-java</artifactId>
@@ -96,16 +120,43 @@
     </dependency>
     <dependency>
         <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-junit</artifactId>
+        <artifactId>cucumber-junit-platform-engine</artifactId>
         <version>${cucumber.version}</version>
         <scope>test</scope>
     </dependency>
+
+    <!-- TestFX for Junit 5 -->
+    <!-- https://mvnrepository.com/artifact/org.testfx/testfx-junit5 -->
     <dependency>
         <groupId>org.testfx</groupId>
-        <artifactId>testfx-junit</artifactId>
+        <artifactId>testfx-junit5</artifactId>
         <version>4.0.18</version>
         <scope>test</scope>
     </dependency>
+
+    <!-- TestFX Monocle for headless testing -->
+    <dependency>
+        <groupId>org.testfx</groupId>
+        <artifactId>openjfx-monocle</artifactId>
+        <version>17.0.10</version>
+        <scope>test</scope>
+    </dependency>
+
+   <!-- Old JUnit -->
+    <!-- <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency> -->
+
+    <!-- Cucumber -->
+    <!-- <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-junit</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency> -->
 </dependencies>
     
 <build>
@@ -135,9 +186,12 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
+            <useModulePath>false</useModulePath>
+            <argLine>${test.argLine}</argLine>
         </configuration>
     </plugin>
 
+    <!-- JLink mvn plugin to create app JAR with common modules -->
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -175,7 +229,7 @@
     </plugin>
 
 
-    <!-- Copes app JAR into jpkg-mods -->
+    <!-- Copes Dragon Slayer JAR into jpkg-mods, for linking -->
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -185,7 +239,7 @@
         </configuration>
     </plugin>
 
-    <!-- Copies runtime dependencies to jpkg-mods -->
+    <!-- Copies runtime dependencies, such as JavaFX, to jpkg-mods -->
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -231,12 +285,12 @@
 
             <!-- Windows related features 
             !! Does not work with APP_IMAGE, only with MSI !! -->
-            <!-- <winMenu>true</winMenu>
-            <winShortcut>true</winShortcut>  -->
+            <!-- <winMenu>true</winMenu> -->
+            <!-- <winShortcut>true</winShortcut> -->
             <!-- Drop for GUI apps if you don't want a console window: -->
             <!-- <winConsole>false</winConsole> -->
             <!-- Optional: icon -->
-            <!-- <icon>${project.basedir}/icons/app.ico</icon> -->
+            <icon>${project.basedir}/src/main/resources/icon/DragonSlayer.ico</icon>
         </configuration>
         <executions>
             <execution>
@@ -298,7 +352,7 @@
             <id>dev</id>
             <properties>
                 <jpackage.type>APP_IMAGE</jpackage.type>
-                <app.version.pkg>4.0.0</app.version.pkg>
+                <app.version.pkg>4.1.0</app.version.pkg>
             </properties>
         </profile>
 
@@ -306,7 +360,14 @@
             <id>prod</id>
             <properties>
                 <jpackage.type>MSI</jpackage.type>
-                <app.version.pkg>4.0.0</app.version.pkg>
+                <app.version.pkg>4.1.0</app.version.pkg>
+            </properties>
+        </profile>
+        <!-- GUI test profile - override default headless mode -->
+        <profile>
+            <id>gui-test</id>
+            <properties>
+                <test.argLine></test.argLine>
             </properties>
         </profile>
     </profiles>
