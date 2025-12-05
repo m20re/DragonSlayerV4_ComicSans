@@ -58,6 +58,9 @@ import java.sql.Date;
 import java.sql.*;
 import java.text.DateFormat;
 import java.time.LocalDate;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -714,7 +717,8 @@ public class Controller implements Initializable {
         ObservableList<Customer> customers = FXCollections.observableArrayList();
 
         // Update the customer list if a change has happened to make it invalid.
-        if (storedCustomers == null) {
+        if (storedCustomers == null)
+        {
             invalidateCustomers();
         }
 
@@ -722,6 +726,9 @@ public class Controller implements Initializable {
         for (Customer c: storedCustomers)
         {
             Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(), c.getNotes(), c.getDelinquent());
+            // Determine whether this customer has any orders using the existing helper
+            int ordersForCustomer = getNumOrdersForCustomer(copy.getLastName());
+            copy.setNoRequests(ordersForCustomer == 0);
             customers.add(copy);
         }
 
@@ -1291,8 +1298,61 @@ public class Controller implements Initializable {
         customerPhoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         customerEmailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         customerNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
+        // Ensure cell text color follows selection + yellow-highlight logic
+        Callback<TableColumn<Customer, String>, TableCell<Customer, String>> customerCellFactory = col ->
+                new TableCell<Customer, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                                setText("");
+                                return;
+                            }
+                            setText(item);
+                            // Let CSS control the text color. We only provide the text value here.
+                    }
+                };
+
+        customerLastNameColumn.setCellFactory(customerCellFactory);
+        customerFirstNameColumn.setCellFactory(customerCellFactory);
+        customerPhoneColumn.setCellFactory(customerCellFactory);
+        customerEmailColumn.setCellFactory(customerCellFactory);
+        customerNotesColumn.setCellFactory(customerCellFactory);
         customerTable.getItems().setAll(this.getCustomers());
         customerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        customerTable.setRowFactory(customer -> {
+            TableRow<Customer> row = new TableRow<Customer>() {
+                @Override
+                public void updateItem(Customer c, boolean empty) {
+                    super.updateItem(c, empty);
+                    // Manage a style-class for rows with no requests. CSS will control colors.
+                    if (c == null || !c.getNoRequests()) {
+                        getStyleClass().remove("no-requests");
+                    } else {
+                        if (!getStyleClass().contains("no-requests")) {
+                            getStyleClass().add("no-requests");
+                        }
+                    }
+                }
+            };
+
+            // Ensure selection changes also update style (updateItem is not always called on selection changes)
+            row.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                Platform.runLater(() -> {
+                    Customer c = row.getItem();
+                    if (c == null || !c.getNoRequests()) {
+                        // nothing to do
+                    } else {
+                        // ensure style-class remains; CSS will style selected state
+                        if (!row.getStyleClass().contains("no-requests")) {
+                            row.getStyleClass().add("no-requests");
+                        }
+                    }
+                });
+            });
+
+            return row;
+        });
     
         // Make Customer Order Table Multi-Selectable
         customerOrderTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -1355,18 +1415,69 @@ public class Controller implements Initializable {
             return new SimpleStringProperty("Never");
         });
         titleNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
+        // Cell factories to control text color for yellow-highlighted rows on selection
+        Callback<TableColumn<Title, String>, TableCell<Title, String>> titleCellFactory = col ->
+                new TableCell<Title, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText("");
+                            setTextFill(Color.BLACK);
+                            return;
+                        }
+                        setText(item);
+                        TableRow<Title> row = getTableRow();
+                        Title t = row == null ? null : row.getItem();
+                        boolean noReq = t != null && t.getNoRequest();
+                        if (noReq && isSelected()) {
+                            setTextFill(Color.BLUE);
+                        } else if (noReq) {
+                            setTextFill(Color.BLACK);
+                        } else {
+                            setTextFill(Color.BLACK);
+                        }
+                    }
+                };
+
+    titleTitleColumn.setCellFactory(titleCellFactory);
+    titleProductIdColumn.setCellFactory(titleCellFactory);
+    titlePriceColumn.setCellFactory(titleCellFactory);
+    // titleDateCreatedColumn and titleLastFlaggedColumn contain LocalDate values
+    // (not String). Leave their default cell factories to avoid class cast issues.
+    titleNotesColumn.setCellFactory(titleCellFactory);
         titleTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        titleTable.setRowFactory(title -> new TableRow<Title>() {
-            @Override
-            public void updateItem(Title t, boolean noRequests) {
-                // int numRequests = t == null ? 100 : getNumberRequests(t.getId());
-                super.updateItem(t, noRequests);
-                if (t == null || !t.getNoRequest()) {
-                    setStyle("");
-                } else {
-                    setStyle("-fx-background-color: #f2e88a;");
+        titleTable.setRowFactory(title -> {
+            TableRow<Title> row = new TableRow<Title>() {
+                @Override
+                public void updateItem(Title t, boolean empty) {
+                    super.updateItem(t, empty);
+                    // Manage style-class for rows with no requests; CSS will handle colors.
+                    if (t == null || !t.getNoRequest()) {
+                        getStyleClass().remove("no-requests");
+                    } else {
+                        if (!getStyleClass().contains("no-requests")) {
+                            getStyleClass().add("no-requests");
+                        }
+                    }
                 }
-            }
+            };
+
+            // Ensure selection changes also update style
+            row.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                Platform.runLater(() -> {
+                    Title t = row.getItem();
+                    if (t == null || !t.getNoRequest()) {
+                        // nothing to do
+                    } else {
+                        if (!row.getStyleClass().contains("no-requests")) {
+                            row.getStyleClass().add("no-requests");
+                        }
+                    }
+                });
+            });
+
+            return row;
         });
 
         // Populate columns for flagged titles table in New Week Pulls Tab
