@@ -59,4 +59,8 @@ abstract class BaseFxUiTest {
 
         r.clickOn("#addCustomerButton");
     }
+
+    protected void openReportsTab(FxRobot r) {
+        r.clickOn("Reports");
+    }
 }
