@@ -38,4 +38,35 @@ public class NewCustomerTitleManager {
             return false;
         }
     } 
+
+    public static boolean handleDeleteCustomerTitle(Connection conn, int customerID, int titleID) {
+        PreparedStatement ppst = null;
+        String sql = "UPDATE CustomerTitles SET DateRemoved = ? WHERE CustomerID = ? AND TitleID = ? AND DateRemoved IS NULL";
+
+        try {
+            ppst = conn.prepareStatement(sql);
+            ppst.setDate(1, new Date(System.currentTimeMillis()));
+            ppst.setInt(2, customerID);
+            ppst.setInt(3, titleID);
+
+            int rowsAffected = ppst.executeUpdate();
+            ppst.close();
+
+            if (rowsAffected > 0) {
+                Log.LogEvent("CustomerTitle Deactivated", 
+                    "Set DateRemoved for CustomerID: " + customerID + ", " + titleID 
+                );
+                return true;
+            } else {
+                Log.LogEvent("CustomerTitle Not Found", 
+                    "No relationship was found for customerID: " + customerID + ", " + titleID
+                );
+                return false;
+            }
+        } catch (SQLException e) {
+            Log.LogEvent("SQL Exception - CustomerTitles Delete", e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

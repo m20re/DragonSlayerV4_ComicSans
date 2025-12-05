@@ -38,6 +38,7 @@ import org.unocapstone.dragonslair.Customer;
 import org.unocapstone.dragonslair.FlaggedTable;
 import org.unocapstone.dragonslair.Log;
 import org.unocapstone.dragonslair.Main;
+import org.unocapstone.dragonslair.NewCustomerTitleManager;
 import org.unocapstone.dragonslair.Order;
 import org.unocapstone.dragonslair.RequestTable;
 import org.unocapstone.dragonslair.Settings;
@@ -1910,6 +1911,10 @@ public class Controller implements Initializable {
                         Log.LogEvent("Deleted Order",
                                 "Deleted order - CustomerID: " + customerId + " - Title: " + order.getTitleName()
                                         + " - Quantity: " + quantity + " - Issue: " + Integer.valueOf(issue));
+                        
+                        // Add an end date to the order
+                        NewCustomerTitleManager.handleDeleteCustomerTitle(conn, customerId, titleId);
+                        
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
