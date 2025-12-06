@@ -407,6 +407,16 @@ public class Controller implements Initializable {
 
             conn.commit();
 
+            // Get the customer ID from selected request
+            if (!selected.isEmpty()) {
+                RequestTable request = selected.get(0);
+                int customerId = getCustomerIdByName(request.getRequestFirstName(), request.getRequestLastName());
+                
+                if (customerId > 0) {
+                    NewCustomerTitleManager.handleDeleteCustomerTitle(conn, customerId, selectedTitle.getId());
+                }
+            }
+
             titleOrdersTable.getItems().setAll(getRequests(selectedTitle.getId(), -9));
             titleNumberRequestsText.setText(
                     "This Title Currently has " + getNumberRequests(selectedTitle.getId()) + " Customer Requests");
@@ -1914,7 +1924,7 @@ public class Controller implements Initializable {
                         
                         // Add an end date to the order
                         NewCustomerTitleManager.handleDeleteCustomerTitle(conn, customerId, titleId);
-                        
+
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
                         sqlExcept.printStackTrace();
@@ -4397,6 +4407,35 @@ public class Controller implements Initializable {
         }
 
         return orders;
+    }
+
+    /**
+     * Yet another helper function that gets the customerID from a selected name
+     * @param title
+     * @param firstName The customer's first name
+     * @param lastName The customer's last name
+     * @return The customer ID, or -1 if not found
+     */
+    private int getCustomerIdByName(String firstName, String lastName) {
+        String sql = """
+            SELECT CUSTOMERID FROM CUSTOMERS 
+            WHERE UPPER(TRIM(FIRSTNAME)) = ? 
+            AND UPPER(TRIM(LASTNAME)) = ?
+            """;
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, (firstName == null ? "" : firstName).trim().toUpperCase());
+            pstmt.setString(2, (lastName == null ? "" : lastName).trim().toUpperCase());
+            
+            var rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("CUSTOMERID");
+            }
+        } catch (SQLException e) {
+            Log.LogEvent("SQL Exception - Get Customer ID", e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public ArrayList<RequestTable> getOrderListForTitle(String title) {
