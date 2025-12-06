@@ -685,6 +685,22 @@ public class Controller implements Initializable {
             // no return, as table creation is more important
         }
 
+        // make sure Customers table has DateRemoved column for soft delete
+        try {
+            sql = "ALTER TABLE Customers ADD DateRemoved DATE";
+            s = conn.createStatement();
+            s.execute(sql);
+            System.out.println("Added DateRemoved column to Customers table");
+        } catch (SQLException sqlExcept) {
+            if (sqlExcept.getSQLState().equals("X0Y32")) {
+                System.out.println("Customers table already contains DateRemoved");
+            } else {
+                Log.LogEvent("SQL Exception", sqlExcept.getMessage());
+                sqlExcept.printStackTrace();
+                return false;
+            }
+        }
+
         System.out.println("DATABASE SCHEMA UP TO-DATE");
         return true;
     }
@@ -1830,27 +1846,42 @@ public class Controller implements Initializable {
                 for (Customer customer : selectedCustomers) {
                     int customerId = customer.getId();
 
-                    PreparedStatement s = null; // To prepare and execute the sql statement to delete the customer
-                    String sql = "DELETE FROM Customers WHERE customerId = ?";
-                    String sql2 = "DELETE FROM Orders WHERE customerId = ?";
+                    PreparedStatement s = null;
+                    String softDeleteCustomerSql = "UPDATE Customers SET DateRemoved = ? WHERE CustomerID = ?";
 
                     try {
-                        s = conn.prepareStatement(sql2);
-                        s.setString(1, Integer.toString(customerId));
+                        // Get the customer's distinct titles
+                        PreparedStatement getTitles = conn.prepareStatement(
+                            "SELECT DISTINCT TITLEID FROM ORDERS WHERE CUSTOMERID = ?"
+                        );
+                        getTitles.setInt(1, customerId);
+                        ResultSet titleResults = getTitles.executeQuery();
+
+                        List<Integer> titleIds = new ArrayList<Integer>();
+                        while (titleResults.next()) {
+                            titleIds.add(titleResults.getInt("TITLEID"));
+                        }
+
+                        getTitles.close();
+
+                        // Set DateRemoved for each customer-title relationship (soft delete)
+                        for (Integer titleId : titleIds) {
+                            NewCustomerTitleManager.handleDeleteCustomerTitle(conn, customerId, titleId);
+                        }
+
+                        // Soft delete the customer by setting DateRemoved
+                        s = conn.prepareStatement(softDeleteCustomerSql);
+                        s.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+                        s.setInt(2, customerId);
                         s.executeUpdate();
                         s.close();
 
-                        s = conn.prepareStatement(sql);
-                        s.setString(1, Integer.toString(customerId));
-                        s.executeUpdate();
-                        s.close();
-
-                        Log.LogEvent("Customer Deleted",
-                                "Deleted Customer - " + customer.getFirstName() + " " + customer.getLastName());
+                        Log.LogEvent("Customer Deactivated",
+                                "Deactivated Customer - " + customer.getFirstName() + " " + customer.getLastName());
 
                     } catch (SQLException sqlExcept) {
                         Log.LogEvent("SQL Exception", sqlExcept.getMessage());
-                        System.err.println("Error deleting customer");
+                        System.err.println("Error deactivating customer");
                         sqlExcept.printStackTrace();
                     }
                 }
@@ -4151,16 +4182,20 @@ public class Controller implements Initializable {
         Statement s = null;
         try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("select * from Customers ORDER BY LASTNAME");
+            // Only show customers that haven't been soft-deleted (DateRemoved IS NULL)
+            ResultSet results = s.executeQuery(
+                "SELECT CustomerID, FirstName, LastName, Phone, Email, Notes, DELINQUENT " +
+                "FROM Customers WHERE DateRemoved IS NULL ORDER BY LASTNAME"
+            );
 
             while (results.next()) {
-                int customerId = results.getInt(1);
-                String firstName = results.getString(2);
-                String lastName = results.getString(3);
-                String phone = results.getString(4);
-                String email = results.getString(5);
-                String notes = results.getString(6);
-                boolean delinquent = results.getBoolean(7);
+                int customerId = results.getInt("CustomerID");
+                String firstName = results.getString("FirstName");
+                String lastName = results.getString("LastName");
+                String phone = results.getString("Phone");
+                String email = results.getString("Email");
+                String notes = results.getString("Notes");
+                boolean delinquent = results.getBoolean("DELINQUENT");
                 storedCustomers.add(new Customer(customerId, firstName, lastName, phone, email, notes, delinquent));
             }
             results.close();

@@ -50,6 +50,7 @@ public class CreateDB {
                         Email varchar(255),
                         Notes varchar(255),
                         DELINQUENT boolean default false not null,
+                        DateRemoved DATE,
                         PRIMARY KEY (CustomerID)
                     )""");
             System.out.println("Created table Customer");
