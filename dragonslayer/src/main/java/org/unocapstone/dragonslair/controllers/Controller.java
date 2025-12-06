@@ -501,6 +501,8 @@ public class Controller implements Initializable {
         Integer issueToStore = (issueInput <= 0) ? null : issueInput;
 
         Integer customerId = null;
+        
+        /* I'm not gonna refactor this to use the helper function... */
         try (PreparedStatement psFind = conn.prepareStatement(
                 "SELECT CUSTOMERID FROM CUSTOMERS WHERE UPPER(LASTNAME)=? AND UPPER(FIRSTNAME)=?")) {
             psFind.setString(1, lastName);
@@ -547,6 +549,10 @@ public class Controller implements Initializable {
                 psOrder.setInt(4, issueToStore);
             }
             psOrder.executeUpdate();
+
+            // Add relationship to CustomerTitles junction table
+            NewCustomerTitleManager.handleNewCustomerTitleOrder(conn, customerId, selectedTitle.getId());
+
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception", e.getMessage());
             new Alert(Alert.AlertType.ERROR, "Failed to add request.", ButtonType.OK).showAndWait();
