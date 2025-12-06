@@ -30,8 +30,20 @@ public class NewCustomerTitleManager {
 
             int rowsAffected = ppst.executeUpdate();
             ppst.close();
+
+
             
-            return rowsAffected > 0;
+            if (rowsAffected > 0) {
+                Log.LogEvent("CustomerTitle Activated", 
+                    "Set DateAdded for CustomerID: " + customerID + ", " + titleID 
+            );
+                return true;
+            } else {
+                Log.LogEvent("CustomerTitle Not Found", 
+                    "No relationship was found for customerID: " + customerID + ", " + titleID
+                );
+                return false;
+            }
         } catch (SQLException e) {
             Log.LogEvent("SQL Exception - CustomerTitles", e.getMessage());
             e.printStackTrace();
