@@ -19,7 +19,12 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Label?>
 
-<TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
+  <children>
+    <HBox spacing="10.0" alignment="CENTER_RIGHT" style="-fx-padding: 10;" prefHeight="40.0">
+      <Button fx:id="enableEditModeButton" mnemonicParsing="false" onAction="#handleEnableEditMode" text="Enable Edit Mode" />
+    </HBox>
+    <TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
   <tabs>
     <Tab text="Customers">
       <content>
@@ -486,4 +491,6 @@
         </content>
     </Tab>
   </tabs>
-</TabPane>
+    </TabPane>
+  </children>
+</VBox>

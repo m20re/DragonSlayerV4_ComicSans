@@ -87,6 +87,8 @@ public class Controller implements Initializable {
     // #region Class Variables
 
     private boolean unsaved = false;
+    private boolean viewMode = true;
+    private final String EDIT_MODE_PASSWORD = "admin";
     private File defaultFL;
     // Allows for an injectable function, useful for testing purposes
     private java.util.function.BiFunction<FileChooser, Window, File> fileChooserProvider = null;
@@ -264,6 +266,22 @@ public class Controller implements Initializable {
     private Button addRequestButton;
     @FXML
     private Label titleTitleText;
+    @FXML
+    private Button addCustomerButtonMain;
+    @FXML
+    private Button deleteCustomerButton;
+    @FXML
+    private Button deleteRequestButton;
+    @FXML
+    private Button deleteTitleButton;
+    @FXML
+    private Button Delinq;
+    @FXML
+    private Button enableEditModeButton;
+    @FXML
+    private Button addTitleButtonMain;
+    @FXML
+    private Button resetFlagsButton;
 
     // private boolean setAll;
     // #endregion
@@ -272,6 +290,37 @@ public class Controller implements Initializable {
         if (storedTitles == null)
             storedTitles = FXCollections.observableArrayList();
         return storedTitles;
+    }
+
+    /**
+     * Updates the disabled state of all action buttons based on the viewMode flag.
+     * When viewMode is true, all buttons for add, delete, edit, tag, and mark delinquent operations are disabled.
+     */
+    private void updateButtonStates() {
+        // Add buttons
+        addCustomerButtonMain.setDisable(viewMode);
+        addRequestButton.setDisable(viewMode);
+        addTitleButtonMain.setDisable(viewMode);
+
+        // Delete buttons
+        deleteCustomerButton.setDisable(viewMode);
+        deleteOrderButton.setDisable(viewMode);
+        deleteRequestButton.setDisable(viewMode);
+        deleteTitleButton.setDisable(viewMode);
+
+        // Edit buttons
+        editCustomerButton.setDisable(viewMode);
+        editOrderButton.setDisable(viewMode);
+        editTitleButton.setDisable(viewMode);
+
+        // Mark delinquent button
+        Delinq.setDisable(viewMode);
+
+        // Reset flags button
+        resetFlagsButton.setDisable(viewMode);
+
+        // Add request button (same as add button, but listed for clarity)
+        newOrderButton.setDisable(viewMode);
     }
 
     @FXML
@@ -1747,6 +1796,10 @@ public class Controller implements Initializable {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
+        // Initialize button states based on viewMode
+        updateButtonStates();
+        updateModeButtonText();
 
     }
 
@@ -3625,6 +3678,34 @@ public class Controller implements Initializable {
     }
 
     /**
+     * Runs when the mode toggle button is pressed. Handles both enabling edit mode (with password)
+     * and enabling view mode (without password).
+     */
+    @FXML
+    void handleEnableEditMode() {
+        if (viewMode) {
+            // Currently in view mode, enable edit mode with password
+            boolean confirm = ConfirmBox.displayWithPassword(
+                    "Enable Edit Mode",
+                    "Are you sure you want to enable edit mode? This will allow modifications to the database.",
+                    EDIT_MODE_PASSWORD);
+            
+            if (confirm) {
+                Platform.runLater(() -> setViewMode(false));
+            }
+        } else {
+            // Currently in edit mode, enable view mode without password
+            boolean confirm = ConfirmBox.display(
+                    "Enable View Mode",
+                    "Switch to view-only mode? This will disable all editing capabilities.");
+            
+            if (confirm) {
+                Platform.runLater(() -> setViewMode(true));
+            }
+        }
+    }
+
+    /**
      * Opens DerbyDB folder automatically
      */
     @FXML
@@ -4509,4 +4590,37 @@ public class Controller implements Initializable {
         s.close();
         ;
     }
+
+    /**
+     * Gets the current viewMode state.
+     * @return true if view mode is enabled, false otherwise
+     */
+    public boolean isViewMode() {
+        return viewMode;
+    }
+
+    /**
+     * Sets the viewMode state and updates button states accordingly.
+     * When viewMode is true, all action buttons (add, delete, edit, tag, mark delinquent) are disabled.
+     * @param viewMode true to enable view-only mode, false to enable editing
+     */
+    public void setViewMode(boolean viewMode) {
+        this.viewMode = viewMode;
+        updateButtonStates();
+        updateModeButtonText();
+    }
+    
+    /**
+     * Updates the mode toggle button text based on the current viewMode state.
+     */
+    private void updateModeButtonText() {
+        if (enableEditModeButton != null) {
+            if (viewMode) {
+                enableEditModeButton.setText("Enable Edit Mode");
+            } else {
+                enableEditModeButton.setText("Enable View Mode");
+            }
+        }
+    }
+
 }
