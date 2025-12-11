@@ -4458,12 +4458,16 @@ public class Controller implements Initializable {
 
     public ArrayList<Order> getOrderListForCustomer(String lastName) {
         ArrayList<Order> orders = new ArrayList<Order>();
+        PreparedStatement ps = null;
         Statement s = null;
         try {
-            s = conn.createStatement();
-            ResultSet customers = s.executeQuery("select CUSTOMERID from CUSTOMERS where LASTNAME='" + lastName + "'");
+            // Should handle names with apostrophe
+            ps = conn.prepareStatement("select CUSTOMERID from CUSTOMERS where LASTNAME=?");
+            ps.setString(1, lastName);
+            ResultSet customers = ps.executeQuery();
             customers.next();
             int customerId = customers.getInt("CUSTOMERID");
+            s = conn.createStatement();
             ResultSet results = s
                     .executeQuery("SELECT * FROM ORDERS o INNER JOIN TITLES t ON o.TITLEID=t.TITLEID where CUSTOMERID="
                             + customerId + " order by TITLE");
@@ -4477,6 +4481,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
+            if (ps != null) ps.close();
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
@@ -4497,12 +4502,15 @@ public class Controller implements Initializable {
 
     public ArrayList<RequestTable> getOrderListForTitle(String title) {
         ArrayList<RequestTable> orders = new ArrayList<RequestTable>();
+        PreparedStatement ps = null;
         Statement s = null;
         try {
-            s = conn.createStatement();
-            ResultSet titles = s.executeQuery("select TITLEID from TITLES where TITLE='" + title + "'");
+            ps = conn.prepareStatement("select TITLEID from TITLES where TITLE=?");
+            ps.setString(1, title);
+            ResultSet titles = ps.executeQuery();
             titles.next();
             int titleId = titles.getInt("TITLEID");
+            s = conn.createStatement();
             ResultSet results = s.executeQuery(
                     "SELECT * FROM ORDERS o INNER JOIN CUSTOMERS c ON o.CUSTOMERID=c.CUSTOMERID where TITLEID="
                             + titleId + " order by LASTNAME");
@@ -4516,6 +4524,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
+            if (ps != null) ps.close();
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
