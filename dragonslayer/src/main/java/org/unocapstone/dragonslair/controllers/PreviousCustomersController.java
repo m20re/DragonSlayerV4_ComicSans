@@ -23,6 +23,8 @@ public class PreviousCustomersController implements Initializable {
     @FXML ToggleButton      showActiveButton;
     @FXML ComboBox<String>  titleComboBox;           // String for title names
     @FXML ComboBox<String>  customerTitleBox;        // String for customer names
+    @FXML TextField         titleSearchField;        // Search field for titles
+    @FXML TextField         customerSearchField;     // Search field for customers
     @FXML Button            clearButton;
     @FXML Button            closeButton;
     
@@ -69,6 +71,16 @@ public class PreviousCustomersController implements Initializable {
         // Bind the table to the filtered list
         // meaning that changing filters will auto-update the table
         customerTitleTable.setItems(filteredRecords);
+
+        // Add listeners to search fields to update combo boxes and trigger filtering
+        titleSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateComboBoxes();
+            applyFilters();
+        });
+        customerSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateComboBoxes();
+            applyFilters();
+        });
     }
     
     /**
@@ -135,7 +147,7 @@ public class PreviousCustomersController implements Initializable {
                 allRecords.add(record);
             }
 
-            populateComboBoxes();
+            updateComboBoxes();
 
             // Apply preselected filters if they were set from main GUI
             applyPreselectedFilters();
@@ -151,28 +163,53 @@ public class PreviousCustomersController implements Initializable {
     }
     
     /**
-     * Populates the title and customer combo boxes (filter boxes) with unique values from the loaded data
-     * Uses Allrecords to do so.
+     * Updates the title and customer combo boxes (filter boxes) with unique values from the loaded data
+     * Uses Allrecords to do so. Filters based on search field text.
+     * Preserves current selections when possible.
      */
-    private void populateComboBoxes() {
+    private void updateComboBoxes() {
+        // Save current selections
+        String currentCustomer = customerTitleBox.getValue();
+        String currentTitle = titleComboBox.getValue();
+
+        // Get search text (case insensitive)
+        String customerSearch = customerSearchField.getText() == null ? "" : customerSearchField.getText().toLowerCase();
+        String titleSearch = titleSearchField.getText() == null ? "" : titleSearchField.getText().toLowerCase();
+
         // Create lists to hold EACH unique customers and titles
         ObservableList<String> uniqueCustomers = FXCollections.observableArrayList();
         ObservableList<String> uniqueTitles = FXCollections.observableArrayList();
 
         for (CustomerTitleRecord record : allRecords) {
-            if (!uniqueCustomers.contains(record.getCustomerName())) {
-                uniqueCustomers.add(record.getCustomerName());
+            // Add customer if it matches search and isn't already in the list
+            if (record.getCustomerName().toLowerCase().contains(customerSearch)) {
+                if (!uniqueCustomers.contains(record.getCustomerName())) {
+                    uniqueCustomers.add(record.getCustomerName());
+                }
             }
-            if (!uniqueTitles.contains(record.getTitleName())) {
-                uniqueTitles.add(record.getTitleName());
+            // Add title if it matches search and isn't already in the list
+            if (record.getTitleName().toLowerCase().contains(titleSearch)) {
+                if (!uniqueTitles.contains(record.getTitleName())) {
+                    uniqueTitles.add(record.getTitleName());
+                }
             }
         }
 
-        // Sort alphabetically and then populates
+        // Sort alphabetically
         uniqueCustomers.sort(String::compareTo);
         uniqueTitles.sort(String::compareTo);
+
+        // Update combo boxes
         customerTitleBox.setItems(uniqueCustomers);
         titleComboBox.setItems(uniqueTitles);
+
+        // Restore selections if they still exist in the filtered lists
+        if (currentCustomer != null && uniqueCustomers.contains(currentCustomer)) {
+            customerTitleBox.setValue(currentCustomer);
+        }
+        if (currentTitle != null && uniqueTitles.contains(currentTitle)) {
+            titleComboBox.setValue(currentTitle);
+        }
     }
 
     /**
@@ -265,11 +302,15 @@ public class PreviousCustomersController implements Initializable {
     }
 
     /**
-     * Applies all active filters (customer, title, and active status)
+     * Applies all active filters (customer, title, search, and active status)
      * updates Filtered records
      */
     @FXML
     private void applyFilters() {
+        // Get search text (case insensitive)
+        String customerSearch = customerSearchField.getText() == null ? "" : customerSearchField.getText().toLowerCase().trim();
+        String titleSearch = titleSearchField.getText() == null ? "" : titleSearchField.getText().toLowerCase().trim();
+
         // Set a new predicate (filter function) on the filtered list
         // This function is called for EACH record to decide if it should be shown
         filteredRecords.setPredicate(record -> {
@@ -277,6 +318,20 @@ public class PreviousCustomersController implements Initializable {
             String selectedCustomer = customerTitleBox.getValue();
             String selectedTitle = titleComboBox.getValue();
             boolean showActiveOnly = showActiveButton.isSelected();
+
+            // Filter by customer search text
+            if (!customerSearch.isEmpty()) {
+                if (!record.getCustomerName().toLowerCase().contains(customerSearch)) {
+                    return false;
+                }
+            }
+
+            // Filter by title search text
+            if (!titleSearch.isEmpty()) {
+                if (!record.getTitleName().toLowerCase().contains(titleSearch)) {
+                    return false;
+                }
+            }
 
             // Filter by customer if one is selected
             // If a customer is selected AND this record doesn't match, hide it (return false)
@@ -305,7 +360,11 @@ public class PreviousCustomersController implements Initializable {
         });
 
         // Update the record count label to show filtered results
-        recordCountStatusLabel.setText(filteredRecords.size() + " Records (filtered from " + allRecords.size() + ")");
+        if (filteredRecords.size() == allRecords.size()) {
+            recordCountStatusLabel.setText(allRecords.size() + " Records");
+        } else {
+            recordCountStatusLabel.setText(filteredRecords.size() + " Records (filtered from " + allRecords.size() + ")");
+        }
     }
 
     /**
@@ -313,11 +372,21 @@ public class PreviousCustomersController implements Initializable {
      */
     @FXML
     private void clearFilters() {
+        // Clear search fields
+        titleSearchField.clear();
+        customerSearchField.clear();
+
+        // Clear combo box selections
         customerTitleBox.setValue(null);
         titleComboBox.setValue(null);
 
         // Turn off the active-only toggle
         showActiveButton.setSelected(false);
+
+        // Repopulate combo boxes with all options
+        updateComboBoxes();
+
+        // Clear all filters
         filteredRecords.setPredicate(p -> true);
         recordCountStatusLabel.setText(allRecords.size() + " Records");
     }
