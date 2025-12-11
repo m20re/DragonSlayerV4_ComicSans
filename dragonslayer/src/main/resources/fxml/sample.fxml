@@ -19,7 +19,18 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21.0.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unocapstone.dragonslair.controllers.Controller">
+  <children>
+    <HBox fx:id="modeBar" alignment="CENTER_LEFT" prefHeight="40.0" spacing="10.0" style="-fx-padding: 10; -fx-background-color: linear-gradient(to left, #E8E8E8, #B0B0B0);">
+         <Text fx:id="modeText" strokeType="OUTSIDE" strokeWidth="0.0" text="View-Only Mode">
+            <font>
+               <Font name="System Bold" size="16.0" />
+            </font>
+         </Text>
+         <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+      <Button fx:id="enableEditModeButton" mnemonicParsing="false" onAction="#handleEnableEditMode" text="Enable Edit Mode" />
+    </HBox>
+    <TabPane fx:id="tabsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
   <tabs>
     <Tab text="Customers">
       <content>
@@ -214,20 +225,44 @@
                     </TableView>
                      <VBox onMouseClicked="#passTitleKeyboardFocus" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                         <children>
-                           <Button fx:id="addRequestButton" mnemonicParsing="false" onAction="#handleAddRequest" prefWidth="100.0" text="Add">
-                              <font>
-                                 <Font size="11.0" />
-                              </font>
-                           </Button>
-                           <Button fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#handleDeleteRequest" prefWidth="100.0" text="Delete">
-                              <font>
-                                 <Font size="11.0" />
-                              </font>
-                           </Button>
-                                    <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                    <Button mnemonicParsing="false" onAction="#handlePreviousCustomersButton" prefWidth="100.0" text="Show Previous Customers" wrapText="true" />
+                           <VBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="8.0">
+                              <children>
+                                 <Button fx:id="addRequestButton"
+                                       text="Add"
+                                       prefWidth="100.0"
+                                       mnemonicParsing="false"
+                                       onAction="#handleAddRequest">
+                                    <font>
+                                       <Font size="11.0"/>
+                                    </font>
+                                 </Button>
+                                 <Button fx:id="deleteRequestButton"
+                                       text="Delete"
+                                       prefWidth="100.0"
+                                       mnemonicParsing="false"
+                                       onAction="#handleDeleteRequest">
+                                    <font>
+                                       <Font size="11.0" />
+                                    </font>
+                                 </Button>
+                                 <Region prefHeight="200.0" 
+                                      prefWidth="200.0" 
+                                      VBox.vgrow="ALWAYS" />
+                                 <Button mnemonicParsing="false" 
+                                         onAction="#handlePreviousCustomersButton" 
+                                         prefWidth="100.0" 
+                                         text="Show Previous Customers" 
+                                         wrapText="true" />
+                        </children>
+                     </VBox>
 
-                     <Button fx:id="singleTitleReportButton" alignment="CENTER" mnemonicParsing="false" onAction="#handleExportSingleTitle" prefWidth="100.0" text="Export Single Title List" wrapText="true">
+                     <Button fx:id="singleTitleReportButton"
+                              alignment="CENTER"
+                              mnemonicParsing="false"
+                              onAction="#handleExportSingleTitle"
+                              prefWidth="100.0"
+                              text="Export Single Title List"
+                              wrapText="true">
                         <font>
                            <Font size="11.0" />
                         </font>
@@ -242,40 +277,26 @@
               </children>
             </VBox>
             <TextField fx:id="TitleSearch" layoutX="10.0" layoutY="44.0" onKeyReleased="#handleTitleSearching" onMouseClicked="#handleTitleSearchDouble" prefHeight="26.0" prefWidth="690.0" promptText="Search..." />
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0"
-                  nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus"
-                  prefHeight="30.0" prefWidth="690.0"
-                  AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#passTitleKeyboardFocus" prefHeight="30.0" prefWidth="690.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                 <children>
-                    <Button fx:id="addTitleButtonMain" mnemonicParsing="false"
-                            onAction="#handleAddTitle"
-                            prefWidth="94.0" text="Add New Title" />
+                    <Button fx:id="addTitleButtonMain" mnemonicParsing="false" onAction="#handleAddTitle" prefWidth="94.0" text="Add New Title" />
 
-                    <Button fx:id="resetFlagsButton" mnemonicParsing="false"
-                            onAction="#resetFlags"
-                            prefWidth="154.0" text="Reset New Release Flags">
+                    <Button fx:id="resetFlagsButton" mnemonicParsing="false" onAction="#resetFlags" prefWidth="154.0" text="Reset New Release Flags">
                         <HBox.margin>
                             <Insets left="5.0" />
                         </HBox.margin>
                     </Button>
-                    <Button mnemonicParsing="false"
-                            onAction="#refreshAll"
-                            prefWidth="140.0"
-                            text="Refresh All Data">
+                    <Button mnemonicParsing="false" onAction="#refreshAll" prefWidth="140.0" text="Refresh All Data">
                         <HBox.margin>
                             <Insets left="5.0" />
                         </HBox.margin>
                     </Button>
-                    <Button fx:id="editTitleButton" mnemonicParsing="false"
-                            onAction="#handleEditTitle"
-                            prefWidth="60.0" text="Edit">
+                    <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#handleEditTitle" prefWidth="60.0" text="Edit">
                         <HBox.margin>
                             <Insets left="110.0" />
                         </HBox.margin>
                     </Button>
-                    <Button fx:id="deleteTitleButton" mnemonicParsing="false"
-                            onAction="#handleDeleteTitle"
-                            prefWidth="60.0" text="Delete">
+                    <Button fx:id="deleteTitleButton" mnemonicParsing="false" onAction="#handleDeleteTitle" prefWidth="60.0" text="Delete">
                         <HBox.margin>
                             <Insets left="5.0" />
                         </HBox.margin>
@@ -471,4 +492,6 @@
         </content>
     </Tab>
   </tabs>
-</TabPane>
+    </TabPane>
+  </children>
+</VBox>

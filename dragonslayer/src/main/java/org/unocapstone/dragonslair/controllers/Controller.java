@@ -29,10 +29,18 @@ import javafx.stage.Window;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
+import javafx.scene.layout.HBox;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.unocapstone.dragonslair.CreateDB;
 import org.unocapstone.dragonslair.Customer;
 import org.unocapstone.dragonslair.FlaggedTable;
@@ -45,9 +53,8 @@ import org.unocapstone.dragonslair.Settings;
 import org.unocapstone.dragonslair.Title;
 import org.unocapstone.dragonslair.ui.AlertBox;
 import org.unocapstone.dragonslair.ui.ConfirmBox;
+
 import org.zeroturnaround.zip.ZipUtil;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 
 import java.io.*;
 import java.net.URL;
@@ -55,6 +62,9 @@ import java.sql.Date;
 import java.sql.*;
 import java.text.DateFormat;
 import java.time.LocalDate;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -81,6 +91,8 @@ public class Controller implements Initializable {
     // #region Class Variables
 
     private boolean unsaved = false;
+    private boolean viewMode = true;
+    private final String EDIT_MODE_PASSWORD = "admin";
     private File defaultFL;
     // Allows for an injectable function, useful for testing purposes
     private java.util.function.BiFunction<FileChooser, Window, File> fileChooserProvider = null;
@@ -258,6 +270,27 @@ public class Controller implements Initializable {
     private Button addRequestButton;
     @FXML
     private Label titleTitleText;
+    @FXML
+    private Button addCustomerButtonMain;
+    @FXML
+    private Button deleteCustomerButton;
+    @FXML
+    private Button deleteRequestButton;
+    @FXML
+    private Button deleteTitleButton;
+    @FXML
+    private Button Delinq;
+    @FXML
+    private Button enableEditModeButton;
+    @FXML
+    private Button addTitleButtonMain;
+    @FXML
+    private Button resetFlagsButton;
+
+    @FXML
+    private HBox modeBar;
+    @FXML
+    private Text modeText;
 
     // private boolean setAll;
     // #endregion
@@ -266,6 +299,37 @@ public class Controller implements Initializable {
         if (storedTitles == null)
             storedTitles = FXCollections.observableArrayList();
         return storedTitles;
+    }
+
+    /**
+     * Updates the disabled state of all action buttons based on the viewMode flag.
+     * When viewMode is true, all buttons for add, delete, edit, tag, and mark delinquent operations are disabled.
+     */
+    private void updateButtonStates() {
+        // Add buttons
+        addCustomerButtonMain.setDisable(viewMode);
+        addRequestButton.setDisable(viewMode);
+        addTitleButtonMain.setDisable(viewMode);
+
+        // Delete buttons
+        deleteCustomerButton.setDisable(viewMode);
+        deleteOrderButton.setDisable(viewMode);
+        deleteRequestButton.setDisable(viewMode);
+        deleteTitleButton.setDisable(viewMode);
+
+        // Edit buttons
+        editCustomerButton.setDisable(viewMode);
+        editOrderButton.setDisable(viewMode);
+        editTitleButton.setDisable(viewMode);
+
+        // Mark delinquent button
+        Delinq.setDisable(viewMode);
+
+        // Reset flags button
+        resetFlagsButton.setDisable(viewMode);
+
+        // Add request button (same as add button, but listed for clarity)
+        newOrderButton.setDisable(viewMode);
     }
 
     @FXML
@@ -764,21 +828,22 @@ public class Controller implements Initializable {
      */
     public ObservableList<Customer> getCustomers() {
 
-        ObservableList<Customer> customers = FXCollections.observableArrayList();
-
         // Update the customer list if a change has happened to make it invalid.
         if (storedCustomers == null) {
             invalidateCustomers();
         }
 
-        // For data safety, create a copy of the customer to avoid data modification of
-        // the original list.
-        for (Customer c : storedCustomers) {
-            Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(),
-                    c.getNotes(), c.getDelinquent());
+        ObservableList<Customer> customers = FXCollections.observableArrayList();
+            
+        // For data safety, create a copy of the customer to avoid data modification of the original list.
+        for (Customer c: storedCustomers)
+        {
+            Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(), c.getNotes(), c.getDelinquent());
+            // Order # for customer is already calculated within invalidateCustomers()
+            copy.setNoRequests(c.getNoRequests());
             customers.add(copy);
         }
-
+        
         return customers;
     }
 
@@ -1345,9 +1410,62 @@ public class Controller implements Initializable {
         customerPhoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         customerEmailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         customerNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
+        // Ensure cell text color follows selection + yellow-highlight logic
+        Callback<TableColumn<Customer, String>, TableCell<Customer, String>> customerCellFactory = col ->
+                new TableCell<Customer, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                                setText("");
+                                return;
+                            }
+                            setText(item);
+                            // Let CSS control the text color. We only provide the text value here.
+                    }
+                };
+
+        customerLastNameColumn.setCellFactory(customerCellFactory);
+        customerFirstNameColumn.setCellFactory(customerCellFactory);
+        customerPhoneColumn.setCellFactory(customerCellFactory);
+        customerEmailColumn.setCellFactory(customerCellFactory);
+        customerNotesColumn.setCellFactory(customerCellFactory);
         customerTable.getItems().setAll(this.getCustomers());
         customerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        customerTable.setRowFactory(customer -> {
+            TableRow<Customer> row = new TableRow<Customer>() {
+                @Override
+                public void updateItem(Customer c, boolean empty) {
+                    super.updateItem(c, empty);
+                    // Manage a style-class for rows with no requests. CSS will control colors.
+                    if (c == null || !c.getNoRequests()) {
+                        getStyleClass().remove("no-requests");
+                    } else {
+                        if (!getStyleClass().contains("no-requests")) {
+                            getStyleClass().add("no-requests");
+                        }
+                    }
+                }
+            };
 
+            // Ensure selection changes also update style (updateItem is not always called on selection changes)
+            row.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                Platform.runLater(() -> {
+                    Customer c = row.getItem();
+                    if (c == null || !c.getNoRequests()) {
+                        // nothing to do
+                    } else {
+                        // ensure style-class remains; CSS will style selected state
+                        if (!row.getStyleClass().contains("no-requests")) {
+                            row.getStyleClass().add("no-requests");
+                        }
+                    }
+                });
+            });
+
+            return row;
+        });
+    
         // Make Customer Order Table Multi-Selectable
         customerOrderTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -1409,18 +1527,69 @@ public class Controller implements Initializable {
             return new SimpleStringProperty("Never");
         });
         titleNotesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
+        // Cell factories to control text color for yellow-highlighted rows on selection
+        Callback<TableColumn<Title, String>, TableCell<Title, String>> titleCellFactory = col ->
+                new TableCell<Title, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText("");
+                            setTextFill(Color.BLACK);
+                            return;
+                        }
+                        setText(item);
+                        TableRow<Title> row = getTableRow();
+                        Title t = row == null ? null : row.getItem();
+                        boolean noReq = t != null && t.getNoRequest();
+                        if (noReq && isSelected()) {
+                            setTextFill(Color.BLUE);
+                        } else if (noReq) {
+                            setTextFill(Color.BLACK);
+                        } else {
+                            setTextFill(Color.BLACK);
+                        }
+                    }
+                };
+
+    titleTitleColumn.setCellFactory(titleCellFactory);
+    titleProductIdColumn.setCellFactory(titleCellFactory);
+    titlePriceColumn.setCellFactory(titleCellFactory);
+    // titleDateCreatedColumn and titleLastFlaggedColumn contain LocalDate values
+    // (not String). Leave their default cell factories to avoid class cast issues.
+    titleNotesColumn.setCellFactory(titleCellFactory);
         titleTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        titleTable.setRowFactory(title -> new TableRow<Title>() {
-            @Override
-            public void updateItem(Title t, boolean noRequests) {
-                // int numRequests = t == null ? 100 : getNumberRequests(t.getId());
-                super.updateItem(t, noRequests);
-                if (t == null || !t.getNoRequest()) {
-                    setStyle("");
-                } else {
-                    setStyle("-fx-background-color: #f2e88a;");
+        titleTable.setRowFactory(title -> {
+            TableRow<Title> row = new TableRow<Title>() {
+                @Override
+                public void updateItem(Title t, boolean empty) {
+                    super.updateItem(t, empty);
+                    // Manage style-class for rows with no requests; CSS will handle colors.
+                    if (t == null || !t.getNoRequest()) {
+                        getStyleClass().remove("no-requests");
+                    } else {
+                        if (!getStyleClass().contains("no-requests")) {
+                            getStyleClass().add("no-requests");
+                        }
+                    }
                 }
-            }
+            };
+
+            // Ensure selection changes also update style
+            row.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                Platform.runLater(() -> {
+                    Title t = row.getItem();
+                    if (t == null || !t.getNoRequest()) {
+                        // nothing to do
+                    } else {
+                        if (!row.getStyleClass().contains("no-requests")) {
+                            row.getStyleClass().add("no-requests");
+                        }
+                    }
+                });
+            });
+
+            return row;
         });
 
         // Populate columns for flagged titles table in New Week Pulls Tab
@@ -1492,8 +1661,9 @@ public class Controller implements Initializable {
                     customerPhoneText.setText(newSelection.getPhone());
                     customerEmailText.setText(newSelection.getEmail());
                     customerNotesText.setText(newSelection.getNotes());
-
-                    if (newSelection.getDelinquent()) {
+    
+                    if(newSelection.getDelinquent())
+                    {
                         delinqNoticeText.setVisible(true);
                     } else
                         delinqNoticeText.setVisible(false);
@@ -1689,6 +1859,10 @@ public class Controller implements Initializable {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
+        // Initialize button states based on viewMode
+        updateButtonStates();
+        updateModeButtonText();
 
     }
 
@@ -3586,6 +3760,38 @@ public class Controller implements Initializable {
     }
 
     /**
+     * Runs when the mode toggle button is pressed. Handles both enabling edit mode (with password)
+     * and enabling view mode (without password).
+     */
+    @FXML
+    void handleEnableEditMode() {
+        if (viewMode) {
+            // Currently in view mode, enable edit mode with password
+            boolean confirm = ConfirmBox.displayWithPassword(
+                    "Enable Edit Mode",
+                    "Are you sure you want to enable edit mode? This will allow modifications to the database.",
+                    EDIT_MODE_PASSWORD);
+            
+            if (confirm) {
+                modeText.setText("Edit Mode");
+                modeBar.setStyle("-fx-padding: 10; -fx-background-color: linear-gradient(to left, #C8E6C9, #81C784);");
+                Platform.runLater(() -> setViewMode(false));
+            }
+        } else {
+            // Currently in edit mode, enable view mode without password
+            boolean confirm = ConfirmBox.display(
+                    "Enable View Mode",
+                    "Switch to view-only mode? This will disable all editing capabilities.");
+            
+            if (confirm) {
+                modeText.setText("View-Only Mode");
+                modeBar.setStyle("-fx-padding: 10; -fx-background-color: linear-gradient(to left, #E8E8E8, #B0B0B0);");
+                Platform.runLater(() -> setViewMode(true));
+            }
+        }
+    }
+
+    /**
      * Opens DerbyDB folder automatically
      */
     @FXML
@@ -4182,24 +4388,37 @@ public class Controller implements Initializable {
         Statement s = null;
         try {
             s = conn.createStatement();
-            // Only show customers that haven't been soft-deleted (DateRemoved IS NULL)
+
+            // Adding a JOIN query to reduce performance bottlenecks
             ResultSet results = s.executeQuery(
-                "SELECT CustomerID, FirstName, LastName, Phone, Email, Notes, DELINQUENT " +
-                "FROM Customers WHERE DateRemoved IS NULL ORDER BY LASTNAME"
+                "SELECT c.*, COUNT(o.TITLEID) as order_count " +
+                "FROM CUSTOMERS c " +
+                "LEFT JOIN ORDERS o ON c.CUSTOMERID = o.CUSTOMERID " +
+                "GROUP BY c.CUSTOMERID, c.FIRSTNAME, c.LASTNAME, c.PHONE, c.EMAIL, c.NOTES, c.DELINQUENT " +
+                "ORDER BY c.LASTNAME"
             );
 
             while (results.next()) {
-                int customerId = results.getInt("CustomerID");
-                String firstName = results.getString("FirstName");
-                String lastName = results.getString("LastName");
-                String phone = results.getString("Phone");
-                String email = results.getString("Email");
-                String notes = results.getString("Notes");
+                int customerId = results.getInt("CUSTOMERID");
+                String firstName = results.getString("FIRSTNAME");
+                String lastName = results.getString("LASTNAME");
+                String phone = results.getString("PHONE");
+                String email = results.getString("EMAIL");
+                String notes = results.getString("NOTES");
                 boolean delinquent = results.getBoolean("DELINQUENT");
-                storedCustomers.add(new Customer(customerId, firstName, lastName, phone, email, notes, delinquent));
+                int orderCount = results.getInt("order_count");
+
+                // storedCustomers.add(new Customer(customerId, firstName, lastName, phone, email, notes, delinquent));
+                Customer customer = new Customer(customerId, firstName, lastName, phone, email, notes, delinquent);
+                customer.setNoRequests(orderCount == 0);
+                storedCustomers.add(customer);
             }
             results.close();
             s.close();
+
+            // Simplify into a single query
+
+
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
@@ -4423,12 +4642,16 @@ public class Controller implements Initializable {
 
     public ArrayList<Order> getOrderListForCustomer(String lastName) {
         ArrayList<Order> orders = new ArrayList<Order>();
+        PreparedStatement ps = null;
         Statement s = null;
         try {
-            s = conn.createStatement();
-            ResultSet customers = s.executeQuery("select CUSTOMERID from CUSTOMERS where LASTNAME='" + lastName + "'");
+            // Should handle names with apostrophe
+            ps = conn.prepareStatement("select CUSTOMERID from CUSTOMERS where LASTNAME=?");
+            ps.setString(1, lastName);
+            ResultSet customers = ps.executeQuery();
             customers.next();
             int customerId = customers.getInt("CUSTOMERID");
+            s = conn.createStatement();
             ResultSet results = s
                     .executeQuery("SELECT * FROM ORDERS o INNER JOIN TITLES t ON o.TITLEID=t.TITLEID where CUSTOMERID="
                             + customerId + " order by TITLE");
@@ -4442,12 +4665,23 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
+            if (ps != null) ps.close();
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
         }
 
         return orders;
+    }
+
+    public int getNumOrdersForCustomer(String lastName) {
+        try {
+            ArrayList<Order> orders = getOrderListForCustomer(lastName);
+            return orders == null ? 0 : orders.size();
+        } catch (Exception ex) {
+            Log.LogEvent("Error", "Unable to get order count for customer: " + lastName + " - " + ex.getMessage());
+            return 0;
+        }
     }
 
     /**
@@ -4481,12 +4715,15 @@ public class Controller implements Initializable {
 
     public ArrayList<RequestTable> getOrderListForTitle(String title) {
         ArrayList<RequestTable> orders = new ArrayList<RequestTable>();
+        PreparedStatement ps = null;
         Statement s = null;
         try {
-            s = conn.createStatement();
-            ResultSet titles = s.executeQuery("select TITLEID from TITLES where TITLE='" + title + "'");
+            ps = conn.prepareStatement("select TITLEID from TITLES where TITLE=?");
+            ps.setString(1, title);
+            ResultSet titles = ps.executeQuery();
             titles.next();
             int titleId = titles.getInt("TITLEID");
+            s = conn.createStatement();
             ResultSet results = s.executeQuery(
                     "SELECT * FROM ORDERS o INNER JOIN CUSTOMERS c ON o.CUSTOMERID=c.CUSTOMERID where TITLEID="
                             + titleId + " order by LASTNAME");
@@ -4500,6 +4737,7 @@ public class Controller implements Initializable {
             }
             results.close();
             s.close();
+            if (ps != null) ps.close();
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
@@ -4574,4 +4812,37 @@ public class Controller implements Initializable {
         s.close();
         ;
     }
+
+    /**
+     * Gets the current viewMode state.
+     * @return true if view mode is enabled, false otherwise
+     */
+    public boolean isViewMode() {
+        return viewMode;
+    }
+
+    /**
+     * Sets the viewMode state and updates button states accordingly.
+     * When viewMode is true, all action buttons (add, delete, edit, tag, mark delinquent) are disabled.
+     * @param viewMode true to enable view-only mode, false to enable editing
+     */
+    public void setViewMode(boolean viewMode) {
+        this.viewMode = viewMode;
+        updateButtonStates();
+        updateModeButtonText();
+    }
+    
+    /**
+     * Updates the mode toggle button text based on the current viewMode state.
+     */
+    private void updateModeButtonText() {
+        if (enableEditModeButton != null) {
+            if (viewMode) {
+                enableEditModeButton.setText("Enable Edit Mode");
+            } else {
+                enableEditModeButton.setText("Enable View Mode");
+            }
+        }
+    }
+
 }
