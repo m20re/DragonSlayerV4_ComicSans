@@ -24,7 +24,16 @@
 }
 
 /* Selection/text color rules */
-/* Default selected row text should be white */
+/* Default non-selected row text should be black */
+.table-row-cell .text {
+    -fx-fill: black;
+}
+
+/* Default selected row should have blue background with white text */
+.table-row-cell:selected {
+    -fx-background-color: #0096C9;
+}
+
 .table-row-cell:selected .text {
     -fx-fill: white;
 }
