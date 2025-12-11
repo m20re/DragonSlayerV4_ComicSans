@@ -33,10 +33,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
+import javafx.scene.layout.HBox;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.unocapstone.dragonslair.CreateDB;
 import org.unocapstone.dragonslair.Customer;
 import org.unocapstone.dragonslair.FlaggedTable;
@@ -48,9 +53,8 @@ import org.unocapstone.dragonslair.Settings;
 import org.unocapstone.dragonslair.Title;
 import org.unocapstone.dragonslair.ui.AlertBox;
 import org.unocapstone.dragonslair.ui.ConfirmBox;
+
 import org.zeroturnaround.zip.ZipUtil;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 
 import java.io.*;
 import java.net.URL;
@@ -282,6 +286,11 @@ public class Controller implements Initializable {
     private Button addTitleButtonMain;
     @FXML
     private Button resetFlagsButton;
+
+    @FXML
+    private HBox modeBar;
+    @FXML
+    private Text modeText;
 
     // private boolean setAll;
     // #endregion
@@ -3689,6 +3698,8 @@ public class Controller implements Initializable {
                     EDIT_MODE_PASSWORD);
             
             if (confirm) {
+                modeText.setText("Edit Mode");
+                modeBar.setStyle("-fx-padding: 10; -fx-background-color: linear-gradient(to left, #C8E6C9, #81C784);");
                 Platform.runLater(() -> setViewMode(false));
             }
         } else {
@@ -3698,6 +3709,8 @@ public class Controller implements Initializable {
                     "Switch to view-only mode? This will disable all editing capabilities.");
             
             if (confirm) {
+                modeText.setText("View-Only Mode");
+                modeBar.setStyle("-fx-padding: 10; -fx-background-color: linear-gradient(to left, #E8E8E8, #B0B0B0);");
                 Platform.runLater(() -> setViewMode(true));
             }
         }
