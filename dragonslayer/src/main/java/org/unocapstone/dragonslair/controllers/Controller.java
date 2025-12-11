@@ -402,6 +402,7 @@ public class Controller implements Initializable {
                         SELECT CUSTOMERID FROM CUSTOMERS
                         WHERE UPPER(TRIM(LASTNAME))  = ?
                           AND UPPER(TRIM(FIRSTNAME)) = ?
+                          AND DATEREMOVED IS NULL
                   )
                   AND ISSUE = ?
                 """;
@@ -413,6 +414,7 @@ public class Controller implements Initializable {
                         SELECT CUSTOMERID FROM CUSTOMERS
                         WHERE UPPER(TRIM(LASTNAME))  = ?
                           AND UPPER(TRIM(FIRSTNAME)) = ?
+                          AND DATEREMOVED IS NULL
                   )
                   AND ISSUE IS NULL
                 """;
@@ -568,7 +570,7 @@ public class Controller implements Initializable {
         
         /* I'm not gonna refactor this to use the helper function... */
         try (PreparedStatement psFind = conn.prepareStatement(
-                "SELECT CUSTOMERID FROM CUSTOMERS WHERE UPPER(LASTNAME)=? AND UPPER(FIRSTNAME)=?")) {
+                "SELECT CUSTOMERID FROM CUSTOMERS WHERE UPPER(LASTNAME)=? AND UPPER(FIRSTNAME)=? AND DATEREMOVED IS NULL")) {
             psFind.setString(1, lastName);
             psFind.setString(2, firstName);
             try (ResultSet rs = psFind.executeQuery()) {
@@ -1200,6 +1202,7 @@ public class Controller implements Initializable {
                     INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
                     WHERE ORDERS.TITLEID = %s
                       AND (ORDERS.ISSUE = %s OR ORDERS.ISSUE IS NULL)
+                      AND CUSTOMERS.DATEREMOVED IS NULL
                     ORDER BY CUSTOMERS.LASTNAME
                     """, titleId, issue);
         } else if (issue == -9) {
@@ -1211,6 +1214,7 @@ public class Controller implements Initializable {
                     FROM CUSTOMERS
                     INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
                     WHERE ORDERS.TITLEID = %s
+                      AND CUSTOMERS.DATEREMOVED IS NULL
                     ORDER BY CUSTOMERS.LASTNAME
                     """, titleId);
         } else {
@@ -1223,6 +1227,7 @@ public class Controller implements Initializable {
                     INNER JOIN ORDERS ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
                     WHERE ORDERS.TITLEID = %s
                       AND ORDERS.ISSUE IS NULL
+                      AND CUSTOMERS.DATEREMOVED IS NULL
                     ORDER BY CUSTOMERS.LASTNAME
                     """, titleId);
         }
@@ -2805,6 +2810,7 @@ public class Controller implements Initializable {
             try {
                 String sql = """
                         SELECT * FROM CUSTOMERS
+                        WHERE DATEREMOVED IS NULL
                         ORDER BY LASTNAME
                         """;
 
@@ -3924,7 +3930,6 @@ public class Controller implements Initializable {
     /**
      * Creates a connection to the database and sets the global conn variable.
      */
-    /* TODO: Add robust database creation handling */
     private void createConnection() {
         try {
             conn = DriverManager.getConnection("jdbc:derby:" + settings.getSetting("dbLocation"));
@@ -4390,10 +4395,12 @@ public class Controller implements Initializable {
             s = conn.createStatement();
 
             // Adding a JOIN query to reduce performance bottlenecks
+            // Note: DATEREMOVED must be in GROUP BY even though WHERE filters it to NULL
             ResultSet results = s.executeQuery(
-                "SELECT c.*, COUNT(o.TITLEID) as order_count " +
+                "SELECT c.CUSTOMERID, c.FIRSTNAME, c.LASTNAME, c.PHONE, c.EMAIL, c.NOTES, c.DELINQUENT, COUNT(o.TITLEID) as order_count " +
                 "FROM CUSTOMERS c " +
                 "LEFT JOIN ORDERS o ON c.CUSTOMERID = o.CUSTOMERID " +
+                "WHERE c.DATEREMOVED IS NULL " +
                 "GROUP BY c.CUSTOMERID, c.FIRSTNAME, c.LASTNAME, c.PHONE, c.EMAIL, c.NOTES, c.DELINQUENT " +
                 "ORDER BY c.LASTNAME"
             );
@@ -4693,9 +4700,10 @@ public class Controller implements Initializable {
      */
     private int getCustomerIdByName(String firstName, String lastName) {
         String sql = """
-            SELECT CUSTOMERID FROM CUSTOMERS 
-            WHERE UPPER(TRIM(FIRSTNAME)) = ? 
+            SELECT CUSTOMERID FROM CUSTOMERS
+            WHERE UPPER(TRIM(FIRSTNAME)) = ?
             AND UPPER(TRIM(LASTNAME)) = ?
+            AND DATEREMOVED IS NULL
             """;
         
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

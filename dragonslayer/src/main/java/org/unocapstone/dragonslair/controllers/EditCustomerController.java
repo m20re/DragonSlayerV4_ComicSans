@@ -76,7 +76,7 @@ public class EditCustomerController implements Initializable {
         {
             get = conn.createStatement();
             update = conn.prepareStatement(sql);
-            ResultSet result = get.executeQuery("SELECT * FROM CUSTOMERS");
+            ResultSet result = get.executeQuery("SELECT * FROM CUSTOMERS WHERE DATEREMOVED IS NULL");
             while (result.next()) {
                 String testFirstName = result.getString("FIRSTNAME");
                 String testLastName = result.getString("LASTNAME");

@@ -65,7 +65,7 @@ public class NewCustomerController implements Initializable {
         try
         {
             get = conn.createStatement();
-            ResultSet result = get.executeQuery("SELECT * FROM CUSTOMERS");
+            ResultSet result = get.executeQuery("SELECT * FROM CUSTOMERS WHERE DATEREMOVED IS NULL");
             while (result.next()) {
                 String testFirstName = result.getString("FIRSTNAME");
                 String testLastName = result.getString("LASTNAME");
