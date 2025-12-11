@@ -1,28 +1,68 @@
 .anchorpane {
-    -fx-background-color: "#eeeeee";
+    -fx-background-color: #eeeeee;
 }
 
 .tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: "#bcbcbc";
+    -fx-background-color: #bcbcbc;
 }
 
 .button {
-    -fx-background-color: "#ffffff";
+    -fx-background-color: #ffffff;
 }
 
 .tab {
-    -fx-background-color: "#ffffff";
+    -fx-background-color: #ffffff;
 }
 
 .tab:selected {
-    -fx-background-color: "#eeeeee";
-    -fx-text-base-color: "#000000";
+    -fx-background-color: #eeeeee;
+    -fx-text-base-color: #000000;
 }
 
 .tab-label {
-    -fx-fill-text: "#ffffff";
+    -fx-fill-text: #ffffff;
 }
 
-"#ffffff"
-"#eeeeee"
-"#bcbcbc"
+/* Selection/text color rules */
+/* Default selected row text should be white */
+.table-row-cell:selected .text {
+    -fx-fill: white;
+}
+
+/* Rows with the no-requests marker (yellow background) */
+.table-row-cell.no-requests {
+    -fx-background-color: #f2e88a;
+}
+.table-row-cell.no-requests .text {
+    -fx-fill: black;
+}
+.table-row-cell.no-requests:selected .text {
+    -fx-fill: blue;
+}
+
+/* Add a full border around selected rows (scoped to customer/title tables).
+   This creates a clear outline around the entire selected row. Include both
+   -fx-* and standard properties for linter compatibility. */
+#customerTable .table-row-cell:selected,
+#titleTable .table-row-cell:selected {
+    -fx-border-color: #2b6fb6; /* accent color */
+    border-color: #2b6fb6;
+    -fx-border-width: 2; /* uniform border (top right bottom left) */
+    border-width: 2;
+    -fx-border-style: solid;
+    border-style: solid;
+    -fx-border-insets: 0;
+}
+
+/* Match for selected rows that also have the no-requests class (keeps same color)
+   — defined separately to ensure the rule applies cleanly when both selectors
+   are present. */
+#customerTable .table-row-cell.no-requests:selected,
+#titleTable .table-row-cell.no-requests:selected {
+    -fx-border-color: #2b6fb6;
+    border-color: #2b6fb6;
+    -fx-border-width: 2;
+    border-width: 2;
+    -fx-border-style: solid;
+    border-style: solid;
+}

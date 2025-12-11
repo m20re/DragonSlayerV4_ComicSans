@@ -34,6 +34,7 @@ public class NewOrderController implements Initializable{
     private Connection conn;
     private int customerId;
     private String customer;
+    private boolean noRequestsFlag;
 
     @FXML private Button addOrderButton;
     @FXML private ComboBox<String> setTitle;
@@ -81,6 +82,7 @@ public class NewOrderController implements Initializable{
             return;
         }
         else {
+            boolean noRequestsFlag = this.noRequestsFlag;
             int titleID = getChoice(setTitle);
             String issue = setIssue.getText();
             if (issue.isBlank()) {

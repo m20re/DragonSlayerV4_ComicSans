@@ -37,6 +37,14 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 1200, 700);
 
+        // Apply application stylesheet so our .no-requests row styles take effect
+        try {
+            String css = getClass().getResource("/styles/newer_style.css").toExternalForm();
+            scene.getStylesheets().add(css);
+        } catch (Exception ex) {
+            System.err.println("Could not load application stylesheet: " + ex.getMessage());
+        }
+
         //Bibash sets an event handler that responds to key typing events within the scene
         keyword = "";
         scene.setOnKeyTyped(this::handleKeyTyped);
