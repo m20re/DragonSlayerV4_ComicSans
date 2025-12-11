@@ -763,24 +763,22 @@ public class Controller implements Initializable {
      */
     public ObservableList<Customer> getCustomers() {
 
-        ObservableList<Customer> customers = FXCollections.observableArrayList();
-
         // Update the customer list if a change has happened to make it invalid.
-        if (storedCustomers == null)
-        {
+        if (storedCustomers == null) {
             invalidateCustomers();
         }
 
+        ObservableList<Customer> customers = FXCollections.observableArrayList();
+            
         // For data safety, create a copy of the customer to avoid data modification of the original list.
         for (Customer c: storedCustomers)
         {
             Customer copy = new Customer(c.getId(), c.getFirstName(), c.getLastName(), c.getPhone(), c.getEmail(), c.getNotes(), c.getDelinquent());
-            // Determine whether this customer has any orders using the existing helper
-            int ordersForCustomer = getNumOrdersForCustomer(copy.getLastName());
-            copy.setNoRequests(ordersForCustomer == 0);
+            // Order # for customer is already calculated within invalidateCustomers()
+            copy.setNoRequests(c.getNoRequests());
             customers.add(copy);
         }
-
+        
         return customers;
     }
 
@@ -4221,20 +4219,37 @@ public class Controller implements Initializable {
         Statement s = null;
         try {
             s = conn.createStatement();
-            ResultSet results = s.executeQuery("select * from Customers ORDER BY LASTNAME");
+
+            // Adding a JOIN query to reduce performance bottlenecks
+            ResultSet results = s.executeQuery(
+                "SELECT c.*, COUNT(o.TITLEID) as order_count " +
+                "FROM CUSTOMERS c " +
+                "LEFT JOIN ORDERS o ON c.CUSTOMERID = o.CUSTOMERID " +
+                "GROUP BY c.CUSTOMERID, c.FIRSTNAME, c.LASTNAME, c.PHONE, c.EMAIL, c.NOTES, c.DELINQUENT " +
+                "ORDER BY c.LASTNAME"
+            );
 
             while (results.next()) {
-                int customerId = results.getInt(1);
-                String firstName = results.getString(2);
-                String lastName = results.getString(3);
-                String phone = results.getString(4);
-                String email = results.getString(5);
-                String notes = results.getString(6);
-                boolean delinquent = results.getBoolean(7);
-                storedCustomers.add(new Customer(customerId, firstName, lastName, phone, email, notes, delinquent));
+                int customerId = results.getInt("CUSTOMERID");
+                String firstName = results.getString("FIRSTNAME");
+                String lastName = results.getString("LASTNAME");
+                String phone = results.getString("PHONE");
+                String email = results.getString("EMAIL");
+                String notes = results.getString("NOTES");
+                boolean delinquent = results.getBoolean("DELINQUENT");
+                int orderCount = results.getInt("order_count");
+
+                // storedCustomers.add(new Customer(customerId, firstName, lastName, phone, email, notes, delinquent));
+                Customer customer = new Customer(customerId, firstName, lastName, phone, email, notes, delinquent);
+                customer.setNoRequests(orderCount == 0);
+                storedCustomers.add(customer);
             }
             results.close();
             s.close();
+
+            // Simplify into a single query
+
+
         } catch (SQLException sqlExcept) {
             Log.LogEvent("SQL Exception", sqlExcept.getMessage());
             sqlExcept.printStackTrace();
