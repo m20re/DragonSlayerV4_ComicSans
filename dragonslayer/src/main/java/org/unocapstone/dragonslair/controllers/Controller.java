@@ -2525,6 +2525,12 @@ public class Controller implements Initializable {
 
         alert.getButtonTypes().setAll(millard, blondo, cancel);
 
+        // Adding IDs to the buttons for testing
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.lookupButton(millard).setId("millardButton");
+        dialogPane.lookupButton(blondo).setId("blondoButton");
+        dialogPane.lookupButton(cancel).setId("cancelButton");
+
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isEmpty() || result.get() == cancel) {

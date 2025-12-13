@@ -85,6 +85,7 @@ public class ConfirmBox {
         Label passwordLabel = new Label("Enter Password:");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setId("passwordField");
         
         Button yesButton = new Button("Confirm");
         yesButton.setId("yesButton");

@@ -21,11 +21,12 @@ public class ExportSaveTest extends BaseFxUiTest {
     private int currIterations = 0;
 
     // Contains a list of created files, will be constantly deleted as test runs
-    private List<File> createdFiles = new ArrayList<File>();
+    private List<File> createdFiles = new ArrayList<File>(TEST_ITERATIONS);
     private int alertCount = 0;
 
     @Test
     void testExport(FxRobot robot) throws Exception {
+        openEditMode(robot);
         // Create the output directory for the test exports
         Path outputDirectory = Paths.get(TEST_OUTPUT_DIRECTORY);
         if (!Files.exists(outputDirectory)) {
@@ -41,19 +42,26 @@ public class ExportSaveTest extends BaseFxUiTest {
         });
 
         openReportsTab(robot);
-        
+        WaitForAsyncUtils.waitForFxEvents();
+        Thread.sleep(200); // Give Reports tab time to fully render in headless mode
+
         // Testing body
         for(int i = 0; i < TEST_ITERATIONS; i++) {
             currIterations += 1;
             System.out.println("============== Test " + currIterations + " ====================");
-            
+
             // click the export button
             robot.clickOn("#exportNewWeekFlagsCustomerRequestsButton");
+            WaitForAsyncUtils.waitForFxEvents();
+            Thread.sleep(100); // Give dialog time to appear
+
+            chooseExportLocation(robot);
+
             // at this point the controller will handle the button press, so we wait
             WaitForAsyncUtils.waitForFxEvents();
 
             // Wait for file to exist
-            File expectedFile = createdFiles.get(createdFiles.size() - 1);
+            File expectedFile = createdFiles.get(i);
             int waitCount = 0;
             while (!expectedFile.exists() && waitCount < 50) {
                 Thread.sleep(50);

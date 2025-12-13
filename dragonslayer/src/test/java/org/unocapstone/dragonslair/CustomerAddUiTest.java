@@ -9,6 +9,7 @@ import org.testfx.api.FxRobot;
 public class CustomerAddUiTest extends BaseFxUiTest {
     @Test
     void addCustomer_oneTime(FxRobot robot) {
+        openEditMode(robot);
         /* Makes sure the customer count is also correct */
         int before = controller.getCustomers().size();
         openAddNewCustomer(robot);

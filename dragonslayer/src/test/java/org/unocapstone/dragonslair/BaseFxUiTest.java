@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 abstract class BaseFxUiTest {
     /* Can only be shared with other tests */
     protected Controller controller;
+    protected String EDIT_PASSWORD = "admin";
 
     @TempDir
     Path derbyHome;
@@ -37,10 +38,21 @@ abstract class BaseFxUiTest {
         stage.show();
         stage.toFront();
         controller = fxmlLoader.getController();
-    }
 
+    }
+    
     protected static String unique(String base) {
         return base + "-" + System.nanoTime();
+    }
+
+    protected void openEditMode(FxRobot r) {
+        r.clickOn("#enableEditModeButton");
+        r.clickOn("#passwordField").write(EDIT_PASSWORD);
+        r.clickOn("#yesButton");
+    }
+
+    protected void chooseExportLocation(FxRobot r) {
+        r.clickOn("#millardButton");
     }
 
     protected void openAddNewCustomer(FxRobot r) {
@@ -63,4 +75,5 @@ abstract class BaseFxUiTest {
     protected void openReportsTab(FxRobot r) {
         r.clickOn("Reports");
     }
+
 }
