@@ -4081,6 +4081,7 @@ public class Controller implements Initializable {
                 SELECT FIRSTNAME, LASTNAME, ISSUE, QUANTITY FROM ORDERS
                 LEFT JOIN CUSTOMERS C on C.CUSTOMERID = ORDERS.CUSTOMERID
                 WHERE TITLEID = %s
+                    AND C.DATEREMOVED IS NULL
                 ORDER BY LASTNAME
                 """, title.getId());
 
@@ -4740,7 +4741,7 @@ public class Controller implements Initializable {
             s = conn.createStatement();
             ResultSet results = s.executeQuery(
                     "SELECT * FROM ORDERS o INNER JOIN CUSTOMERS c ON o.CUSTOMERID=c.CUSTOMERID where TITLEID="
-                            + titleId + " order by LASTNAME");
+                            + titleId + " AND c.DATEREMOVED IS NULL order by LASTNAME");
 
             while (results.next()) {
                 String lastname = results.getString("LASTNAME");

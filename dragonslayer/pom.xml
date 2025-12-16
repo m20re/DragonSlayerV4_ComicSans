@@ -352,7 +352,7 @@
             <id>dev</id>
             <properties>
                 <jpackage.type>APP_IMAGE</jpackage.type>
-                <app.version.pkg>4.1.0</app.version.pkg>
+                <app.version.pkg>4.2.0</app.version.pkg>
             </properties>
         </profile>
 
@@ -360,7 +360,7 @@
             <id>prod</id>
             <properties>
                 <jpackage.type>MSI</jpackage.type>
-                <app.version.pkg>4.1.0</app.version.pkg>
+                <app.version.pkg>4.2.0</app.version.pkg>
             </properties>
         </profile>
         <!-- GUI test profile - override default headless mode -->
