@@ -1979,7 +1979,8 @@ public class Controller implements Initializable {
             window.setOnHidden(e -> {
                 if (newTitleController.titleWasAdded) {
                     invalidateTitles();
-                    titleTable.setItems(getTitles());
+                    titleTable.refresh();
+                    monthlyBreakdownTable.refresh();
                     this.loadReportsTab();
                 }
             });
