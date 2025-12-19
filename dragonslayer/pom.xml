@@ -287,8 +287,7 @@
             !! Does not work with APP_IMAGE, only with MSI !! -->
             <!-- <winMenu>true</winMenu> -->
             <!-- <winShortcut>true</winShortcut> -->
-            <!-- Drop for GUI apps if you don't want a console window: -->
-            <!-- <winConsole>false</winConsole> -->
+            <winConsole>false</winConsole>
             <!-- Optional: icon -->
             <icon>${project.basedir}/src/main/resources/icon/DragonSlayer.ico</icon>
         </configuration>
@@ -363,7 +362,7 @@
                 <app.version.pkg>4.2.0</app.version.pkg>
             </properties>
         </profile>
-        <!-- GUI test profile - override default headless mode -->
+        <!-- GUI test profile - to show the test manually -->
         <profile>
             <id>gui-test</id>
             <properties>
