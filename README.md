@@ -43,7 +43,7 @@ Run the command: `mvn clean package -DskipTests -Pdev`
 ###### Bug fixes
 - Fixed title overflowing into other fields
 
-#### Version 4.2.0-Snapshot
+#### Version 4.2.0
 ###### Additions
 - Included Sort by Last flagged column
 - Previous Customers Tab, along with associated junction table
@@ -52,7 +52,12 @@ Run the command: `mvn clean package -DskipTests -Pdev`
 - Added save test in hopes of squashing the bug
 - Added "Pending" stats in the flagged column
 - Created a pop-up to save to two different stores
+- Created "View-Only" mode.
+- Included Show Previous Box to show titles with older customers
 
 ###### Bug fixes
 - Added potential fix for exports not saving correctly
 - Fixed bug where the customer wasn't being added to a title
+- Fixed performance searching performance issues
+- Fixed edge-case where names with hyphens will break the SQL query
+- Fixed titles not displaying after being created.
